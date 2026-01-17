@@ -4,45 +4,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giriş - Yoklama Sistemi</title>
+    <title>Giriş Yap - Yoklama Sistemi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
-<body class="auth-page">
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi</h1>
-                <h2>Yüz Tanıma ile Yoklama Sistemi</h2>
-            </div>
+<body>
 
-            <div th:if="${mesaj}" class="alert alert-success"><i class="fas fa-check-circle"></i> <span
-                    th:text="${mesaj}"></span></div>
-            <div th:if="${hata}" class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <span
-                    th:text="${hata}"></span></div>
-
-            <form th:action="@{/giris}" method="post" class="auth-form">
-                <div class="form-group">
-                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="email" name="email" required placeholder="ornek@adiyaman.edu.tr">
+    <main class="auth-page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1><i class="fas fa-graduation-cap"></i> Giriş Yap</h1>
+                    <h2>Adıyaman Üniversitesi Yoklama Sistemi</h2>
                 </div>
 
-                <div class="form-group">
-                    <label for="sifre"><i class="fas fa-lock"></i> Şifre</label>
-                    <input type="password" id="sifre" name="sifre" required placeholder="Şifrenizi girin">
+                <div th:if="${mesaj}" class="mb-4 text-success"
+                    style="background: var(--success-bg); padding: 0.75rem; border-radius: var(--radius);">
+                    <i class="fas fa-check-circle"></i> <span th:text="${mesaj}"></span>
+                </div>
+                <div th:if="${hata}" class="mb-4 text-danger"
+                    style="background: var(--danger-bg); padding: 0.75rem; border-radius: var(--radius);">
+                    <i class="fas fa-exclamation-circle"></i> <span th:text="${hata}"></span>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block">
-                    <i class="fas fa-sign-in-alt"></i> Giriş Yap
-                </button>
-            </form>
+                <form th:action="@{/giris}" method="post">
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> E-posta Adresi</label>
+                        <input type="email" id="email" name="email" required placeholder="ornek@adiyaman.edu.tr">
+                    </div>
 
-            <div class="auth-footer">
-                <p>Hesabınız yok mu? <a th:href="@{/kayit}"><i class="fas fa-user-plus"></i> Kayıt Ol</a></p>
+                    <div class="form-group">
+                        <label for="sifre"><i class="fas fa-lock"></i> Şifre</label>
+                        <input type="password" id="sifre" name="sifre" required placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-sign-in-alt"></i> Giriş Yap
+                    </button>
+                </form>
+
+                <div class="auth-footer mt-3">
+                    <p class="text-muted mb-2">Hesabınız yok mu?</p>
+                    <a th:href="@{/kayit}" class="btn btn-secondary btn-block">
+                        <i class="fas fa-user-plus"></i> Hesap Oluştur
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
+
 </body>
 
 </html>

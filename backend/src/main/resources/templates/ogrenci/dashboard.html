@@ -4,83 +4,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ana Sayfa - Yoklama Sistemi</title>
+    <title>Öğrenci Paneli - Yoklama Sistemi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
+
+    <!-- Navbar -->
     <nav class="navbar">
-        <div class="nav-brand">
-            <a th:href="@{/ogrenci}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi - Öğrenci</a>
-        </div>
-        <div class="nav-links">
-            <a th:href="@{/ogrenci}" class="active"><i class="fas fa-home"></i> Ana Sayfa</a>
-            <a th:href="@{/ogrenci/yuz-kayit}"><i class="fas fa-camera"></i> Yüz Kaydı</a>
-            <a th:href="@{/ogrenci/gecmis}"><i class="fas fa-history"></i> Geçmişim</a>
-            <a th:href="@{/cikis}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/ogrenci}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi</a>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/ogrenci}" class="active"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a th:href="@{/ogrenci/yuz-kayit}"><i class="fas fa-camera"></i> Yüz Kaydı</a>
+                <a th:href="@{/profil}"><i class="fas fa-user"></i> Profil</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="container">
-        <h1><i class="fas fa-user-graduate"></i> Hoş Geldin, <span th:text="${ogrenci.ad}"></span>!</h1>
-
-        <div th:if="${mesaj}" class="alert alert-success"><i class="fas fa-check-circle"></i> <span
-                th:text="${mesaj}"></span></div>
-        <div th:if="${hata}" class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <span
-                th:text="${hata}"></span></div>
-
-        <!-- Yüz Kaydı Uyarısı -->
-        <div th:unless="${yuzKayitli}" class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle"></i>
-            Yüz kaydınız yapılmamış! Yoklamaya katılabilmek için önce
-            <a th:href="@{/ogrenci/yuz-kayit}">yüz kaydı</a> yapmalısınız.
+        <div class="text-center mb-4">
+            <h1 class="mb-2"><i class="fas fa-user-graduate"></i> Hoş Geldin, <span th:text="${ogrenci.ad}"></span>!
+            </h1>
+            <p>Derslerinizi ve aktif yoklamaları buradan takip edebilirsiniz.</p>
         </div>
 
-        <!-- Aktif Yoklamalar -->
-        <div class="card">
-            <h2><i class="fas fa-bell"></i> Aktif Yoklamalar</h2>
-            <div th:if="${aktifYoklamalar.isEmpty()}" class="alert alert-info">
-                <i class="fas fa-info-circle"></i> Şu anda aktif yoklama bulunmuyor.
+        <!-- Alerts -->
+        <div th:if="${mesaj}" class="mb-4 text-success"
+            style="background: var(--success-bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--success);">
+            <i class="fas fa-check-circle"></i> <span th:text="${mesaj}"></span>
+        </div>
+        <div th:if="${hata}" class="mb-4 text-danger"
+            style="background: var(--danger-bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--danger);">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${hata}"></span>
+        </div>
+        <div th:unless="${yuzKayitli}" class="mb-4 text-warning"
+            style="background: var(--warning-bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--warning);">
+            <i class="fas fa-exclamation-triangle"></i> Yüz kaydınız bulunmuyor. <a th:href="@{/ogrenci/yuz-kayit}"
+                style="text-decoration: underline; font-weight: bold;">Yüz Kaydı Yap</a>
+        </div>
+
+        <!-- Active Sessions -->
+        <section class="mb-4">
+            <h2 class="mb-3 text-primary"><i class="fas fa-bell"></i> Aktif Yoklamalar</h2>
+
+            <div th:if="${aktifYoklamalar.isEmpty()}" class="card text-center text-muted">
+                <i class="fas fa-coffee fa-3x mb-2"></i>
+                <p>Şu an aktif bir yoklama bulunmuyor.</p>
             </div>
+
             <div th:unless="${aktifYoklamalar.isEmpty()}" class="course-grid">
-                <div th:each="oturum : ${aktifYoklamalar}" class="course-card" style="border-left: 4px solid #28a745;">
-                    <h3 th:text="${oturum.ders.ad}"></h3>
+                <div th:each="oturum : ${aktifYoklamalar}" class="course-card active-session">
+                    <div class="d-flex justify-between align-start mb-2">
+                        <span class="badge badge-success">CANLI</span>
+                        <div class="stat-icon"
+                            style="background: var(--success-bg); color: var(--success); width: 40px; height: 40px; font-size: 1rem;">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+
+                    <h3 th:text="${oturum.ders.ad}" class="mb-1"></h3>
                     <p class="course-code" th:text="${oturum.ders.kod}"></p>
-                    <p class="course-info">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        <span th:text="${oturum.ders.ogretmen.tamAd}"></span>
-                    </p>
-                    <a th:href="@{/ogrenci/yoklama/{id}(id=${oturum.id})}"
-                        th:class="${yuzKayitli ? 'btn btn-success' : 'btn btn-secondary'}" th:disabled="${!yuzKayitli}">
-                        <i class="fas fa-face-smile"></i> Yoklamaya Katıl
-                    </a>
+                    <p class="course-info"><i class="fas fa-chalkboard-teacher"></i> <span
+                            th:text="${oturum.ders.ogretmen.tamAd}"></span></p>
+
+                    <div class="card-footer">
+                        <a th:href="@{/ogrenci/yoklama/{id}(id=${oturum.id})}"
+                            th:class="${yuzKayitli ? 'btn btn-success btn-block' : 'btn btn-secondary btn-block'}"
+                            th:disabled="${!yuzKayitli}">
+                            <i class="fas fa-face-smile"></i> Yoklamaya Katıl
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Derslerim -->
-        <div class="card">
-            <h2><i class="fas fa-book"></i> Derslerim</h2>
-            <div th:if="${dersler.isEmpty()}" class="alert alert-info">
-                <i class="fas fa-info-circle"></i> Henüz kayıtlı olduğunuz ders bulunmuyor.
+        <!-- All Courses -->
+        <section>
+            <h2 class="mb-3"><i class="fas fa-book"></i> Derslerim</h2>
+
+            <div th:if="${dersler.isEmpty()}" class="card text-center text-muted">
+                <p>Henüz kayıtlı olduğunuz bir ders yok.</p>
             </div>
+
             <div th:unless="${dersler.isEmpty()}" class="course-grid">
                 <div th:each="ders : ${dersler}" class="course-card">
-                    <h3 th:text="${ders.ad}"></h3>
+                    <div class="d-flex justify-between align-start mb-2">
+                        <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                    </div>
+
+                    <h3 th:text="${ders.ad}" class="mb-1"></h3>
                     <p class="course-code" th:text="${ders.kod}"></p>
-                    <p th:if="${ders.ogretmen != null}" class="course-info">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        <span th:text="${ders.ogretmen.tamAd}"></span>
-                    </p>
+                    <p class="course-info"><i class="fas fa-chalkboard-teacher"></i> <span
+                            th:text="${ders.ogretmen != null ? ders.ogretmen.tamAd : 'Atanmadı'}"></span></p>
+
+                    <div class="card-footer">
+                        <span class="badge badge-info">KAYITLI</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     </main>
 
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+        <div class="container">
+            <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma Sistemi</p>
+        </div>
     </footer>
+
 </body>
 
 </html>

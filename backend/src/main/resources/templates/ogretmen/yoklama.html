@@ -4,122 +4,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yoklama Detayı - Yoklama Sistemi</title>
+    <!-- Auto refresh every 5 seconds to see new students -->
+    <meta http-equiv="refresh" content="5">
+    <title>Aktif Yoklama - Öğretmen Paneli</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
+
     <nav class="navbar">
-        <div class="nav-brand">
-            <a th:href="@{/ogretmen}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi - Öğretmen</a>
-        </div>
-        <div class="nav-links">
-            <a th:href="@{/ogretmen}"><i class="fas fa-book"></i> Derslerim</a>
-            <a th:href="@{/ogretmen/gecmis}"><i class="fas fa-history"></i> Yoklama Geçmişi</a>
-            <a th:href="@{/cikis}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/ogretmen}"><i class="fas fa-chalkboard-teacher"></i> Öğretmen Paneli</a>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/ogretmen}"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
         </div>
     </nav>
 
     <main class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h1><i class="fas fa-clipboard-list"></i> <span th:text="${ders.ad}"></span> - Yoklama</h1>
-            <form th:if="${oturum.aktif}" th:action="@{/ogretmen/yoklama/bitir/{id}(id=${oturum.id})}" method="post">
-                <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-stop"></i> Yoklamayı Bitir
-                </button>
-            </form>
-        </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon" style="background: var(--success);"><i class="fas fa-user-check"></i></div>
-                <div class="stat-info">
-                    <span class="stat-value" th:text="${kayitlar.size()}">0</span>
-                    <span class="stat-label">Katılan</span>
+        <div class="card active-session mb-4" style="border: 2px solid var(--success) !important;">
+            <div class="text-center">
+                <div class="pulse-icon mb-2" style="font-size: 3rem; color: var(--success);">
+                    <i class="fas fa-wifi"></i>
                 </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: var(--danger);"><i class="fas fa-user-times"></i></div>
-                <div class="stat-info">
-                    <span class="stat-value" th:text="${katilmayanlar.size()}">0</span>
-                    <span class="stat-label">Katılmayan</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-users"></i></div>
-                <div class="stat-info">
-                    <span class="stat-value" th:text="${toplamOgrenci}">0</span>
-                    <span class="stat-label">Toplam Öğrenci</span>
+                <h1 class="text-success mb-2">Yoklama Aktif</h1>
+                <h2 th:text="${oturum.ders.ad}" class="mb-1"></h2>
+                <p class="text-muted"><span th:text="${oturum.ders.kod}"></span> - <span
+                        th:text="${oturum.ders.sinif != null ? oturum.ders.sinif.ad : ''}"></span></p>
+
+                <div class="mt-3">
+                    <form th:action="@{/ogretmen/yoklama/bitir/{id}(id=${oturum.id})}" method="post">
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-stop-circle"></i> Yoklamayı Bitir
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <div th:if="${oturum.aktif}" class="alert alert-success">
-            <i class="fas fa-broadcast-tower"></i> Yoklama aktif! Öğrenciler yüz taraması ile katılabilir.
-        </div>
-        <div th:unless="${oturum.aktif}" class="alert alert-info">
-            <i class="fas fa-info-circle"></i> Yoklama oturumu bitirildi.
+        <div class="d-flex justify-between align-center mb-3">
+            <h3><i class="fas fa-users"></i> Katılan Öğrenciler (<span th:text="${kayitlar.size()}"></span>)</h3>
+            <div class="text-muted" style="font-size: 0.9rem;">
+                <i class="fas fa-sync fa-spin"></i> Otomatik Yenileniyor...
+            </div>
         </div>
 
-        <!-- Katılanlar -->
         <div class="card">
-            <h2><i class="fas fa-user-check"></i> Katılan Öğrenciler</h2>
-            <div th:if="${kayitlar.isEmpty()}" class="alert alert-warning">
-                <i class="fas fa-hourglass-half"></i> Henüz katılım yok.
+            <div th:if="${kayitlar.isEmpty()}" class="text-center text-muted" style="padding: 2rem;">
+                <p>Henüz katılan öğrenci yok.</p>
             </div>
-            <div th:unless="${kayitlar.isEmpty()}" class="attendance-list">
-                <div th:each="kayit : ${kayitlar}" class="attendance-item present">
-                    <div>
-                        <strong th:text="${kayit.ogrenci.tamAd}"></strong>
-                        <span style="color: var(--gray);"> - </span>
-                        <span th:text="${kayit.ogrenci.ogrenciNo}" style="color: var(--gray);"></span>
-                    </div>
-                    <div>
-                        <span class="badge badge-success">
-                            <i class="fas fa-clock"></i>
-                            <span th:text="${#temporals.format(kayit.katilimZamani, 'HH:mm:ss')}"></span>
-                        </span>
-                        <span th:if="${kayit.guvenSkor != null}" class="badge badge-info">
-                            <i class="fas fa-face-smile"></i>
-                            <span th:text="${#numbers.formatDecimal(kayit.guvenSkor * 100, 1, 0)}"></span>%
-                        </span>
-                    </div>
-                </div>
-            </div>
+
+            <table th:unless="${kayitlar.isEmpty()}" class="table">
+                <thead>
+                    <tr>
+                        <th>Öğrenci No</th>
+                        <th>Ad Soyad</th>
+                        <th>Katılım Zamanı</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="kayit : ${kayitlar}">
+                        <td data-label="No" th:text="${kayit.ogrenci.ogrenciNo}"></td>
+                        <td data-label="Ad Soyad" style="font-weight: 600;" th:text="${kayit.ogrenci.tamAd}"></td>
+                        <td data-label="Saat" th:text="${#temporals.format(kayit.katilimZamani, 'HH:mm:ss')}"></td>
+                        <td data-label="Durum"><span class="badge badge-success">VAR</span></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <!-- Katılmayanlar -->
-        <div class="card">
-            <h2><i class="fas fa-user-times"></i> Katılmayan Öğrenciler</h2>
-            <div th:if="${katilmayanlar.isEmpty()}" class="alert alert-success">
-                <i class="fas fa-check-circle"></i> Tüm öğrenciler katıldı!
-            </div>
-            <div th:unless="${katilmayanlar.isEmpty()}" class="attendance-list">
-                <div th:each="ogrenci : ${katilmayanlar}" class="attendance-item absent">
-                    <div>
-                        <strong th:text="${ogrenci.tamAd}"></strong>
-                        <span style="color: var(--gray);"> - </span>
-                        <span th:text="${ogrenci.ogrenciNo}" style="color: var(--gray);"></span>
-                    </div>
-                    <span class="badge badge-danger">Katılmadı</span>
-                </div>
-            </div>
-        </div>
-
-        <a th:href="@{/ogretmen}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Geri Dön
-        </a>
     </main>
 
     <footer>
-        <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+        <div class="container">
+            <p>&copy; 2026 Adıyaman Üniversitesi - Öğretmen Modülü</p>
+        </div>
     </footer>
 
-    <script th:if="${oturum.aktif}">
-        // Aktif yoklama ise her 10 saniyede sayfayı yenile
-        setTimeout(() => location.reload(), 10000);
-    </script>
 </body>
 
 </html>

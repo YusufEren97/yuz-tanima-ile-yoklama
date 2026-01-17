@@ -4,83 +4,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öğretmen Yönetimi - Yoklama Sistemi</title>
+    <title>Öğretmen Yönetimi - Admin Paneli</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
+
     <nav class="navbar">
-        <div class="nav-brand">
-            <a th:href="@{/admin}">🎓 Adıyaman Üniversitesi - Admin</a>
-        </div>
-        <div class="nav-links">
-            <a th:href="@{/admin}">Dashboard</a>
-            <a th:href="@{/admin/bolumler}">Bölümler</a>
-            <a th:href="@{/admin/dersler}">Dersler</a>
-            <a th:href="@{/admin/ogretmenler}" class="active">Öğretmenler</a>
-            <a th:href="@{/cikis}" class="btn-logout">Çıkış</a>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/admin}"><i class="fas fa-user-shield"></i> Admin Paneli</a>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/admin}"><i class="fas fa-home"></i> Dashboard</a>
+                <a th:href="@{/admin/bolumler}"><i class="fas fa-building"></i> Bölümler</a>
+                <a th:href="@{/admin/ogrenciler}"><i class="fas fa-user-graduate"></i> Öğrenciler</a>
+                <a th:href="@{/admin/ogretmenler}" class="active"><i class="fas fa-chalkboard-teacher"></i>
+                    Öğretmenler</a>
+                <a th:href="@{/admin/dersler}"><i class="fas fa-book"></i> Dersler</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
         </div>
     </nav>
 
     <main class="container">
-        <h1>👨‍🏫 Öğretmen Yönetimi</h1>
+        <div class="d-flex justify-between align-center mb-4">
+            <h1><i class="fas fa-chalkboard-teacher"></i> Öğretmenler</h1>
+        </div>
 
-        <div th:if="${mesaj}" class="alert alert-success" th:text="${mesaj}"></div>
-        <div th:if="${hata}" class="alert alert-error" th:text="${hata}"></div>
+        <div th:if="${mesaj}" class="mb-4 text-success"
+            style="background: var(--success-bg); padding: 1rem; border-radius: var(--radius);"><span
+                th:text="${mesaj}"></span></div>
+        <div th:if="${hata}" class="mb-4 text-danger"
+            style="background: var(--danger-bg); padding: 1rem; border-radius: var(--radius);"><span
+                th:text="${hata}"></span></div>
 
-        <!-- Yeni Öğretmen Ekle -->
-        <div class="card">
-            <h2>Yeni Öğretmen Ekle</h2>
+        <!-- Ekleme Formu -->
+        <div class="card mb-4" style="background: var(--surface); border-left: 4px solid var(--primary);">
+            <h3 class="mb-3"><i class="fas fa-user-plus"></i> Yeni Öğretmen Ekle</h3>
             <form th:action="@{/admin/ogretmenler/ekle}" method="post">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Ad</label>
                         <input type="text" name="ad" placeholder="Ad" required>
                     </div>
                     <div class="form-group">
-                        <label>Soyad</label>
                         <input type="text" name="soyad" placeholder="Soyad" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" placeholder="ornek@adiyaman.edu.tr" required>
+                        <input type="email" name="email" placeholder="E-posta" required>
                     </div>
                     <div class="form-group">
-                        <label>Şifre</label>
                         <input type="password" name="sifre" placeholder="Şifre" required minlength="6">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Öğretmen Ekle</button>
+                <button type="submit" class="btn btn-primary btn-block">Öğretmen Kaydet</button>
             </form>
         </div>
 
-        <!-- Öğretmen Listesi -->
+        <!-- Liste -->
         <div class="card">
-            <h2>Mevcut Öğretmenler</h2>
             <table class="table">
                 <thead>
                     <tr>
                         <th>Ad Soyad</th>
-                        <th>Email</th>
-                        <th>Durum</th>
+                        <th>E-posta</th>
                         <th>İşlemler</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="ogretmen : ${ogretmenler}">
-                        <td th:text="${ogretmen.tamAd}"></td>
-                        <td th:text="${ogretmen.email}"></td>
-                        <td>
-                            <span th:if="${ogretmen.aktif}" class="badge badge-success">Aktif</span>
-                            <span th:unless="${ogretmen.aktif}" class="badge badge-danger">Pasif</span>
-                        </td>
-                        <td>
+                        <td data-label="Ad Soyad" style="font-weight: 600;" th:text="${ogretmen.tamAd}"></td>
+                        <td data-label="E-posta" th:text="${ogretmen.email}"></td>
+                        <td data-label="İşlemler">
                             <form th:action="@{/admin/ogretmenler/sil/{id}(id=${ogretmen.id})}" method="post"
-                                style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Bu öğretmeni silmek istediğinize emin misiniz?')">Sil</button>
+                                onsubmit="return confirm('Bu öğretmeni silmek istediğinize emin misiniz?');">
+                                <button type="submit" class="btn btn-danger btn-sm" style="padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
@@ -90,8 +93,11 @@
     </main>
 
     <footer>
-        <p>© 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+        <div class="container">
+            <p>&copy; 2026 Admin Paneli v2.0</p>
+        </div>
     </footer>
+
 </body>
 
 </html>

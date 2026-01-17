@@ -4,98 +4,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bölüm Yönetimi - Yoklama Sistemi</title>
+    <title>Bölüm Yönetimi - Admin Paneli</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
+
     <nav class="navbar">
-        <div class="nav-brand">
-            <a th:href="@{/admin}">🎓 Adıyaman Üniversitesi - Admin</a>
-        </div>
-        <div class="nav-links">
-            <a th:href="@{/admin}">Dashboard</a>
-            <a th:href="@{/admin/bolumler}" class="active">Bölümler</a>
-            <a th:href="@{/admin/dersler}">Dersler</a>
-            <a th:href="@{/admin/ogretmenler}">Öğretmenler</a>
-            <a th:href="@{/cikis}" class="btn-logout">Çıkış</a>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/admin}"><i class="fas fa-user-shield"></i> Admin Paneli</a>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/admin}"><i class="fas fa-home"></i> Dashboard</a>
+                <a th:href="@{/admin/bolumler}" class="active"><i class="fas fa-building"></i> Bölümler</a>
+                <a th:href="@{/admin/ogrenciler}"><i class="fas fa-user-graduate"></i> Öğrenciler</a>
+                <a th:href="@{/admin/ogretmenler}"><i class="fas fa-chalkboard-teacher"></i> Öğretmenler</a>
+                <a th:href="@{/admin/dersler}"><i class="fas fa-book"></i> Dersler</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
         </div>
     </nav>
 
     <main class="container">
-        <h1>🏛️ Bölüm Yönetimi</h1>
+        <div class="d-flex justify-between align-center mb-4">
+            <h1><i class="fas fa-building"></i> Bölümler</h1>
+        </div>
 
-        <div th:if="${mesaj}" class="alert alert-success" th:text="${mesaj}"></div>
-        <div th:if="${hata}" class="alert alert-error" th:text="${hata}"></div>
+        <div th:if="${mesaj}" class="mb-4 text-success"
+            style="background: var(--success-bg); padding: 1rem; border-radius: var(--radius);"><span
+                th:text="${mesaj}"></span></div>
+        <div th:if="${hata}" class="mb-4 text-danger"
+            style="background: var(--danger-bg); padding: 1rem; border-radius: var(--radius);"><span
+                th:text="${hata}"></span></div>
 
-        <!-- Yeni Bölüm Ekle -->
-        <div class="card">
-            <h2>Yeni Bölüm Ekle</h2>
-            <form th:action="@{/admin/bolumler/ekle}" method="post" class="form-inline">
-                <div class="form-group">
-                    <input type="text" name="ad" placeholder="Bölüm Adı" required>
+        <!-- Ekleme Formu -->
+        <div class="card mb-4" style="background: var(--surface); border-left: 4px solid var(--primary);">
+            <h3 class="mb-3"><i class="fas fa-plus-circle"></i> Yeni Bölüm Ekle</h3>
+            <form th:action="@{/admin/bolumler/ekle}" method="post">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <input type="text" name="ad" placeholder="Bölüm Adı (Örn: Bilgisayar Mühendisliği)" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <input type="text" name="kod" placeholder="Kod (Örn: CENG)" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <select name="sinifSayisi">
+                            <option value="0">Sınıf Ekleme</option>
+                            <option value="4">4 Sınıf Oluştur</option>
+                            <option value="6">6 Sınıf Oluştur</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" style="height: 100%; width: 100%;">Ekle</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input type="text" name="kod" placeholder="Bölüm Kodu (Örn: BILMUH)" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Ekle</button>
             </form>
         </div>
 
-        <!-- Bölüm Listesi -->
+        <!-- Liste -->
         <div class="card">
-            <h2>Mevcut Bölümler</h2>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Bölüm Adı</th>
                         <th>Kod</th>
+                        <th>Bölüm Adı</th>
                         <th>Sınıflar</th>
                         <th>İşlemler</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="bolum : ${bolumler}">
-                        <td th:text="${bolum.ad}"></td>
-                        <td th:text="${bolum.kod}"></td>
-                        <td>
-                            <span th:each="sinif, iter : ${bolum.siniflar}">
-                                <span th:text="${sinif.ad}"></span><span th:if="${!iter.last}">, </span>
-                            </span>
+                        <td data-label="Kod" th:text="${bolum.kod}" style="font-weight: 600;"></td>
+                        <td data-label="Bölüm Adı" th:text="${bolum.ad}"></td>
+                        <td data-label="Sınıflar">
+                            <span th:each="sinif : ${bolum.siniflar}" class="badge badge-info mr-1"
+                                style="margin-right: 4px;" th:text="${sinif.ad}"></span>
                         </td>
-                        <td>
+                        <td data-label="İşlemler">
                             <form th:action="@{/admin/bolumler/sil/{id}(id=${bolum.id})}" method="post"
-                                style="display:inline;">
-                                <button type="submit" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Bu bölümü silmek istediğinize emin misiniz?')">Sil</button>
+                                onsubmit="return confirm('Bu bölümü silmek istediğinize emin misiniz?');">
+                                <button type="submit" class="btn btn-danger btn-sm" style="padding: 0.25rem 0.5rem;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </form>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <!-- Sınıf Ekle -->
-        <div class="card">
-            <h2>Yeni Sınıf Ekle</h2>
-            <form th:action="@{/admin/siniflar/ekle}" method="post" class="form-inline">
-                <div class="form-group">
-                    <select name="bolumId" required>
-                        <option value="">Bölüm Seçin</option>
-                        <option th:each="bolum : ${bolumler}" th:value="${bolum.id}" th:text="${bolum.ad}"></option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="text" name="ad" placeholder="Sınıf Adı (Örn: 1. Sınıf)" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Ekle</button>
-            </form>
-        </div>
     </main>
 
     <footer>
-        <p>© 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+        <div class="container">
+            <p>&copy; 2026 Admin Paneli v2.0</p>
+        </div>
     </footer>
+
 </body>
 
 </html>

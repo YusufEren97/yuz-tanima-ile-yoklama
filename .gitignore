@@ -18,8 +18,17 @@ venv/
 .env
 
 # Face data (large files)
-face-service/encodings/*.pkl
-face-service/yuz_verileri/
+python-yuz-servisi/encodings/*.pkl
+python-yuz-servisi/yuz_verileri/
+python-yuz-servisi/temp/
+python-yuz-servisi/__pycache__/
+python-yuz-servisi/venv/
+
+# General
+**/*.jpg
+**/*.png
+!backend/src/main/resources/static/images/**
+!backend/src/main/resources/static/assets/**
 
 # Logs
 *.log

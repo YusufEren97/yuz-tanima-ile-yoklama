@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilim - Yoklama Sistemi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi</a>
+            </div>
+            <div class="nav-links">
+                <!-- Role Based Links -->
+                <th:block th:if="${kullanici.rol.name() == 'OGRENCI'}">
+                    <a th:href="@{/ogrenci}"><i class="fas fa-home"></i> Ana Sayfa</a>
+                    <a th:href="@{/ogrenci/yuz-kayit}"><i class="fas fa-camera"></i> Yüz Kaydı</a>
+                </th:block>
+
+                <th:block th:if="${kullanici.rol.name() == 'OGRETMEN'}">
+                    <a th:href="@{/ogretmen}"><i class="fas fa-home"></i> Ana Sayfa</a>
+                </th:block>
+
+                <th:block th:if="${kullanici.rol.name() == 'ADMIN'}">
+                    <a th:href="@{/admin}"><i class="fas fa-home"></i> Dashboard</a>
+                </th:block>
+
+                <a th:href="@{/profil}" class="active"><i class="fas fa-user-cog"></i> Profil</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <div th:if="${mesaj}" class="mb-4 text-success"
+            style="background: var(--success-bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--success);">
+            <i class="fas fa-check-circle"></i> <span th:text="${mesaj}"></span>
+        </div>
+        <div th:if="${hata}" class="mb-4 text-danger"
+            style="background: var(--danger-bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--danger);">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${hata}"></span>
+        </div>
+
+        <div class="card text-center" style="max-width: 600px; margin: 0 auto; margin-bottom: 2rem;">
+            <div class="profile-avatar mb-3"
+                style="width: 100px; height: 100px; margin: 0 auto; background: linear-gradient(135deg, var(--primary), #818cf8); color: white; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; border-radius: 50%; box-shadow: var(--shadow-lg);">
+                <span
+                    th:text="${#strings.substring(kullanici.ad, 0, 1) + #strings.substring(kullanici.soyad, 0, 1)}"></span>
+            </div>
+
+            <h1 class="mb-1" th:text="${kullanici.tamAd}" style="font-size: 1.5rem;"></h1>
+            <p class="text-muted mb-3" th:text="${kullanici.email}"></p>
+
+            <span class="badge badge-info mb-4" style="font-size: 0.9rem;" th:text="${kullanici.rol}"></span>
+
+            <div class="text-left"
+                style="background: var(--background); padding: 1.5rem; border-radius: var(--radius); margin-top: 1rem;">
+                <div class="d-flex justify-between mb-2 border-bottom pb-2"
+                    style="border-color: var(--border) !important;">
+                    <strong class="text-muted"><i class="fas fa-id-card"></i> Öğrenci No:</strong>
+                    <span style="font-weight: 600;"
+                        th:text="${kullanici.ogrenciNo != null ? kullanici.ogrenciNo : '-'}"></span>
+                </div>
+                <div class="d-flex justify-between mb-2">
+                    <strong class="text-muted"><i class="fas fa-building"></i> Bölüm:</strong>
+                    <span style="font-weight: 600;"
+                        th:text="${kullanici.bolum != null ? kullanici.bolum.ad : '-'}"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Based Quick Actions -->
+        <div class="card mb-4" style="max-width: 600px; margin: 0 auto;">
+            <h3 class="mb-3"><i class="fas fa-bolt"></i> Hızlı İşlemler</h3>
+
+            <div th:if="${kullanici.rol.name() == 'OGRENCI'}">
+                <a th:href="@{/ogrenci/gecmis}" class="btn btn-secondary btn-block">
+                    <i class="fas fa-history"></i> Yoklama Geçmişimi Gör
+                </a>
+                <a th:href="@{/ogrenci/yuz-kayit}" class="btn btn-primary btn-block mt-2">
+                    <i class="fas fa-camera"></i> Yüz Kaydı Güncelle
+                </a>
+            </div>
+
+            <div th:if="${kullanici.rol.name() == 'OGRETMEN'}">
+                <a th:href="@{/ogretmen/gecmis}" class="btn btn-secondary btn-block">
+                    <i class="fas fa-history"></i> Ders Geçmişlerini İncele
+                </a>
+                <a th:href="@{/ogretmen}" class="btn btn-primary btn-block mt-2">
+                    <i class="fas fa-chalkboard"></i> Derslerime Git
+                </a>
+            </div>
+
+            <div th:if="${kullanici.rol.name() == 'ADMIN'}">
+                <a th:href="@{/admin}" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-shield"></i> Yönetim Paneline Git
+                </a>
+            </div>
+        </div>
+
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <h2 class="mb-3"><i class="fas fa-lock"></i> Şifre Değiştir</h2>
+            <form th:action="@{/profil/sifre-degistir}" method="post">
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Mevcut Şifre</label>
+                    <input type="password" name="mevcutSifre" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-unlock-alt"></i> Yeni Şifre</label>
+                        <input type="password" name="yeniSifre" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-double"></i> Yeni Şifre (Tekrar)</label>
+                        <input type="password" name="yeniSifreTekrar" required minlength="6">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-save"></i> Şifreyi Güncelle
+                </button>
+            </form>
+        </div>
+
+        <div class="mobile-only mt-4" style="max-width: 600px; margin: 0 auto;">
+            <a th:href="@{/cikis}" class="btn btn-danger btn-block btn-lg">
+                <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Profil Yönetimi</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

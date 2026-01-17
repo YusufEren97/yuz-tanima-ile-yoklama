@@ -73,6 +73,13 @@ public class KullaniciService {
         });
     }
 
+    public void yuzKaydiniSil(Long id) {
+        kullaniciRepository.findById(id).ifPresent(kullanici -> {
+            kullanici.setYuzKayitli(false);
+            kullaniciRepository.save(kullanici);
+        });
+    }
+
     public boolean sifreDogrula(String email, String sifre) {
         return kullaniciRepository.findByEmail(email)
                 .map(k -> passwordEncoder.matches(sifre, k.getSifre()))

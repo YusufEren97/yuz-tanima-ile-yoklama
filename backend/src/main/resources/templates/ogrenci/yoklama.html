@@ -10,75 +10,110 @@
 </head>
 
 <body>
+
     <nav class="navbar">
-        <div class="nav-brand">
-            <a th:href="@{/ogrenci}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi - Öğrenci</a>
-        </div>
-        <div class="nav-links">
-            <a th:href="@{/ogrenci}"><i class="fas fa-home"></i> Ana Sayfa</a>
-            <a th:href="@{/ogrenci/yuz-kayit}"><i class="fas fa-camera"></i> Yüz Kaydı</a>
-            <a th:href="@{/ogrenci/gecmis}"><i class="fas fa-history"></i> Geçmişim</a>
-            <a th:href="@{/cikis}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/ogrenci}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi</a>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/ogrenci}"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a th:href="@{/ogrenci/yuz-kayit}"><i class="fas fa-camera"></i> Yüz Kaydı</a>
+                <a th:href="@{/profil}"><i class="fas fa-user"></i> Profil</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
         </div>
     </nav>
 
     <main class="container">
-        <div th:if="${hata}" class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <span
-                th:text="${hata}"></span></div>
+        <!-- Error Alert -->
+        <div th:if="${hata}" class="mb-4 text-danger"
+            style="background: var(--danger-bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--danger);">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${hata}"></span>
+        </div>
 
-        <div th:if="${zadenKatildi}" class="card" style="text-align: center;">
-            <h2 style="color: var(--success);"><i class="fas fa-check-circle"></i> Zaten Katıldınız!</h2>
-            <p>Bu yoklamaya zaten katılım sağladınız.</p>
-            <a th:href="@{/ogrenci}" class="btn btn-primary" style="margin-top: 1rem;">
+        <!-- ALREADY JOINED State -->
+        <div th:if="${zadenKatildi}" class="card text-center" style="padding: 3rem 1.5rem;">
+            <div style="font-size: 4rem; color: var(--success); margin-bottom: 1rem;">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2 class="text-success mb-2">Zaten Katıldınız!</h2>
+            <p class="mb-4">Bu dersin yoklamasına katılımınız başarıyla kaydedilmiştir.</p>
+            <a th:href="@{/ogrenci}" class="btn btn-primary">
                 <i class="fas fa-arrow-left"></i> Ana Sayfaya Dön
             </a>
         </div>
 
+        <!-- JOIN State -->
         <div th:unless="${zadenKatildi}" class="card">
-            <h1><i class="fas fa-clipboard-check"></i> <span th:text="${oturum.ders.ad}"></span> - Yoklamaya Katıl</h1>
+            <div class="text-center mb-4">
+                <h1><i class="fas fa-clipboard-check"></i> Yoklamaya Katıl</h1>
+                <p class="text-primary font-weight-bold" style="font-size: 1.1rem;">
+                    <span th:text="${oturum.ders.ad}"></span>
+                </p>
+                <div class="badge badge-info mt-2">
+                    <i class="fas fa-clock"></i> <span
+                        th:text="${#temporals.format(oturum.baslangicZamani, 'HH:mm')}"></span> - <span
+                        th:text="${#temporals.format(oturum.bitisZamani, 'HH:mm')}"></span>
+                </div>
+            </div>
 
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i>
-                Yoklamaya katılmak için yüzünüzü kameraya gösterin ve "Katıl" butonuna tıklayın.
+            <div class="alert mb-4"
+                style="background: var(--primary-soft); color: var(--primary); padding: 1rem; border-radius: var(--radius);">
+                <i class="fas fa-info-circle"></i> Lütfen yüzünüzü kameraya gösterin ve aşağıdaki butona tıklayın.
             </div>
 
             <div class="camera-container">
                 <div class="camera-view">
-                    <video id="video" autoplay playsinline></video>
+                    <video id="video" autoplay playsinline style="width: 100%; border-radius: var(--radius);"></video>
                     <canvas id="canvas" style="display: none;"></canvas>
                 </div>
 
                 <form id="attendForm" th:action="@{/ogrenci/yoklama/{id}(id=${oturum.id})}" method="post"
-                    enctype="multipart/form-data">
+                    enctype="multipart/form-data" class="mt-4">
                     <input type="file" name="fotograf" id="photoInput" accept="image/*" style="display: none;">
 
-                    <button type="button" id="attendBtn" class="btn btn-success btn-lg btn-block"
-                        style="margin-top: 1rem;">
-                        <i class="fas fa-face-smile"></i> Yüzümü Tarat ve Katıl
+                    <button type="button" id="attendBtn" class="btn btn-success btn-lg btn-block mb-3">
+                        <i class="fas fa-face-smile"></i> Yüzümü Tanıt ve Katıl
                     </button>
-                </form>
 
-                <a th:href="@{/ogrenci}" class="btn btn-secondary btn-block" style="margin-top: 0.5rem;">
-                    <i class="fas fa-arrow-left"></i> Vazgeç
-                </a>
+                    <a th:href="@{/ogrenci}" class="btn btn-secondary btn-block">
+                        <i class="fas fa-times"></i> Vazgeç
+                    </a>
+                </form>
             </div>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+        <div class="container">
+            <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma Sistemi</p>
+        </div>
     </footer>
+
+    <!-- Success Modal (Hidden by default) -->
+    <div id="successModal" class="success-modal">
+        <div class="success-card-modal">
+            <div class="checkmark-circle mb-3">
+                <div class="checkmark draw"></div>
+            </div>
+            <h2 class="text-success mb-2">Yoklama Başarılı!</h2>
+            <p class="text-muted mb-4">Derse katılımınız onaylandı. İyi dersler!</p>
+            <div class="d-flex justify-between" style="gap: 10px;">
+                <button onclick="window.location.href='/ogrenci'" class="btn btn-primary btn-block">Tamam</button>
+            </div>
+        </div>
+    </div>
 
     <script th:unless="${zadenKatildi}">
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const attendBtn = document.getElementById('attendBtn');
         const attendForm = document.getElementById('attendForm');
-        const photoInput = document.getElementById('photoInput');
+        const successModal = document.getElementById('successModal');
 
         let stream = null;
 
-        // Kamerayı başlat
         async function startCamera() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({
@@ -86,40 +121,45 @@
                 });
                 video.srcObject = stream;
             } catch (err) {
-                alert('Kamera erişimi sağlanamadı: ' + err.message);
+                alert('Kamera başlatılamadı: ' + err.message);
             }
         }
 
-        // Katıl
         async function attend() {
+            if (!stream) return;
+
+            // Capture
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
 
             canvas.toBlob(async blob => {
                 const formData = new FormData();
-                formData.append('fotograf', blob, 'face.jpg');
+                formData.append('fotograf', blob, 'attendance.jpg');
+
+                attendBtn.disabled = true;
+                attendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Doğrulanıyor...';
 
                 try {
-                    attendBtn.disabled = true;
-                    attendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Yüz doğrulanıyor...';
-
                     const response = await fetch(attendForm.action, {
-                        method: 'POST',
-                        body: formData
+                        method: 'POST', body: formData
                     });
 
-                    if (response.redirected) {
-                        window.location.href = response.url;
+                    if (response.ok) {
+                        successModal.style.display = 'flex';
+                        setTimeout(() => {
+                            if (response.redirected) window.location.href = response.url;
+                            else window.location.href = '/ogrenci';
+                        }, 2500);
                     } else {
-                        window.location.href = '/ogrenci';
+                        throw new Error('Yüz eşleşmedi veya hata oluştu.');
                     }
                 } catch (err) {
-                    alert('Hata oluştu: ' + err.message);
+                    alert('Hata: ' + err.message);
                     attendBtn.disabled = false;
-                    attendBtn.innerHTML = '<i class="fas fa-face-smile"></i> Yüzümü Tarat ve Katıl';
+                    attendBtn.innerHTML = '<i class="fas fa-face-smile"></i> Tekrar Dene';
                 }
-            }, 'image/jpeg', 0.9);
+            }, 'image/jpeg', 0.8);
         }
 
         attendBtn.addEventListener('click', attend);

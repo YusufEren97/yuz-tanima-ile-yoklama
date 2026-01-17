@@ -10,49 +10,58 @@
 </head>
 
 <body>
+
     <nav class="navbar">
-        <div class="nav-brand">
-            <a th:href="@{/ogrenci}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi - Öğrenci</a>
-        </div>
-        <div class="nav-links">
-            <a th:href="@{/ogrenci}"><i class="fas fa-home"></i> Ana Sayfa</a>
-            <a th:href="@{/ogrenci/yuz-kayit}"><i class="fas fa-camera"></i> Yüz Kaydı</a>
-            <a th:href="@{/ogrenci/gecmis}" class="active"><i class="fas fa-history"></i> Geçmişim</a>
-            <a th:href="@{/cikis}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/ogrenci}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi</a>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/ogrenci}"><i class="fas fa-home"></i> Ana Sayfa</a>
+                <a th:href="@{/ogrenci/yuz-kayit}"><i class="fas fa-camera"></i> Yüz Kaydı</a>
+                <a th:href="@{/profil}"><i class="fas fa-user"></i> Profil</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
         </div>
     </nav>
 
     <main class="container">
-        <h1><i class="fas fa-history"></i> Yoklama Geçmişim</h1>
+        <div class="d-flex justify-between align-center mb-4">
+            <h1><i class="fas fa-history"></i> Yoklama Geçmişim</h1>
+            <div class="desktop-only text-muted">
+                <span th:text="${#lists.size(kayitlar)}"></span> kayıt bulundu
+            </div>
+        </div>
 
         <div class="card">
-            <div th:if="${kayitlar.isEmpty()}" class="alert alert-info">
-                <i class="fas fa-info-circle"></i> Henüz yoklama kaydınız bulunmuyor.
+            <div th:if="${kayitlar.isEmpty()}" class="text-center text-muted" style="padding: 2rem;">
+                <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                <p>Henüz katıldığınız bir yoklama bulunmuyor.</p>
             </div>
+
             <table th:unless="${kayitlar.isEmpty()}" class="table">
                 <thead>
                     <tr>
                         <th>Ders</th>
                         <th>Tarih</th>
-                        <th>Katılım Saati</th>
+                        <th>Saat</th>
                         <th>Durum</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="kayit : ${kayitlar}">
-                        <td>
-                            <strong th:text="${kayit.oturum.ders.ad}"></strong>
-                            <br><small th:text="${kayit.oturum.ders.kod}" style="color: var(--gray);"></small>
+                        <td data-label="Ders">
+                            <div style="font-weight: 600;" th:text="${kayit.oturum.ders.ad}"></div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);"
+                                th:text="${kayit.oturum.ders.kod}"></div>
                         </td>
-                        <td th:text="${#temporals.format(kayit.katilimZamani, 'dd.MM.yyyy')}"></td>
-                        <td th:text="${#temporals.format(kayit.katilimZamani, 'HH:mm:ss')}"></td>
-                        <td>
-                            <span th:if="${kayit.katildi}" class="badge badge-success">
-                                <i class="fas fa-check"></i> Katıldı
-                            </span>
-                            <span th:unless="${kayit.katildi}" class="badge badge-danger">
-                                <i class="fas fa-times"></i> Katılmadı
-                            </span>
+                        <td data-label="Tarih" th:text="${#temporals.format(kayit.katilimZamani, 'dd.MM.yyyy')}"></td>
+                        <td data-label="Saat" th:text="${#temporals.format(kayit.katilimZamani, 'HH:mm')}"></td>
+                        <td data-label="Durum">
+                            <span th:if="${kayit.katildi}" class="badge badge-success"><i class="fas fa-check"></i>
+                                Katıldı</span>
+                            <span th:unless="${kayit.katildi}" class="badge badge-danger"><i class="fas fa-times"></i>
+                                Yok</span>
                         </td>
                     </tr>
                 </tbody>
@@ -61,8 +70,11 @@
     </main>
 
     <footer>
-        <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+        <div class="container">
+            <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma Sistemi</p>
+        </div>
     </footer>
+
 </body>
 
 </html>

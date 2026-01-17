@@ -68,7 +68,7 @@ public class OgrenciController {
 
         Map<String, Object> sonuc = yuzTanimaService.yuzKaydet(
                 ogrenci.getId(),
-                ogrenci.getTamAd(),
+                ogrenci.getOgrenciNo(),
                 fotograflar);
 
         if (Boolean.TRUE.equals(sonuc.get("basarili"))) {
@@ -94,7 +94,7 @@ public class OgrenciController {
 
         Map<String, Object> sonuc = yuzTanimaService.yuzGuncelle(
                 ogrenci.getId(),
-                ogrenci.getTamAd(),
+                ogrenci.getOgrenciNo(),
                 fotograflar);
 
         if (Boolean.TRUE.equals(sonuc.get("basarili"))) {
@@ -103,6 +103,20 @@ public class OgrenciController {
             redirect.addFlashAttribute("hata", sonuc.get("mesaj"));
         }
 
+        return "redirect:/ogrenci/yuz-kayit";
+    }
+
+    @PostMapping("/yuz-sil")
+    public String yuzSil(Authentication auth, RedirectAttributes redirect) {
+        Kullanici ogrenci = getKullanici(auth);
+
+        // 1. Python servisinden sil
+        yuzTanimaService.yuzSil(ogrenci.getId());
+
+        // 2. Veritabanından flag'i kaldır
+        kullaniciService.yuzKaydiniSil(ogrenci.getId());
+
+        redirect.addFlashAttribute("mesaj", "Yüz kaydınız başarıyla silindi ve sıfırlandı.");
         return "redirect:/ogrenci/yuz-kayit";
     }
 

@@ -4,67 +4,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yoklama Geçmişi - Yoklama Sistemi</title>
+    <title>Yoklama Geçmişi - Öğretmen Paneli</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
+
     <nav class="navbar">
-        <div class="nav-brand">
-            <a th:href="@{/ogretmen}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi - Öğretmen</a>
-        </div>
-        <div class="nav-links">
-            <a th:href="@{/ogretmen}"><i class="fas fa-book"></i> Derslerim</a>
-            <a th:href="@{/ogretmen/gecmis}" class="active"><i class="fas fa-history"></i> Yoklama Geçmişi</a>
-            <a th:href="@{/cikis}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/ogretmen}"><i class="fas fa-chalkboard-teacher"></i> Öğretmen Paneli</a>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/ogretmen}"><i class="fas fa-home"></i> Derslerim</a>
+                <a th:href="@{/profil}"><i class="fas fa-user"></i> Profil</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
         </div>
     </nav>
 
     <main class="container">
-        <h1><i class="fas fa-history"></i> Yoklama Geçmişi</h1>
+
+        <div class="d-flex justify-between align-center mb-4">
+            <div>
+                <h1><i class="fas fa-history"></i> Tüm Yoklama Geçmişi</h1>
+                <p class="text-muted">Tamamlanmış tüm ders oturumları</p>
+            </div>
+            <a th:href="@{/ogretmen}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Geri Dön</a>
+        </div>
 
         <div class="card">
-            <table class="table">
+            <div th:if="${oturumlar.isEmpty()}" class="text-center text-muted" style="padding: 2rem;">
+                <p>Geçmiş yoklama kaydı bulunmuyor.</p>
+            </div>
+
+            <table th:unless="${oturumlar.isEmpty()}" class="table">
                 <thead>
                     <tr>
                         <th>Ders</th>
                         <th>Tarih</th>
-                        <th>Başlangıç</th>
-                        <th>Bitiş</th>
-                        <th>Durum</th>
-                        <th>İşlemler</th>
+                        <th>Saat</th>
+                        <th>Katılım</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="oturum : ${oturumlar}">
-                        <td>
-                            <strong th:text="${oturum.ders.ad}"></strong>
-                            <br><small th:text="${oturum.ders.kod}" style="color: var(--gray);"></small>
+                        <td data-label="Ders">
+                            <div style="font-weight: 600;" th:text="${oturum.ders.ad}"></div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);" th:text="${oturum.ders.kod}">
+                            </div>
                         </td>
-                        <td th:text="${#temporals.format(oturum.baslangicZamani, 'dd.MM.yyyy')}"></td>
-                        <td th:text="${#temporals.format(oturum.baslangicZamani, 'HH:mm')}"></td>
-                        <td
-                            th:text="${oturum.bitisZamani != null ? #temporals.format(oturum.bitisZamani, 'HH:mm') : '-'}">
+                        <td data-label="Tarih" th:text="${#temporals.format(oturum.baslangicZamani, 'dd.MM.yyyy')}">
                         </td>
-                        <td>
-                            <span th:if="${oturum.aktif}" class="badge badge-success">Aktif</span>
-                            <span th:unless="${oturum.aktif}" class="badge badge-info">Tamamlandı</span>
-                        </td>
-                        <td>
-                            <a th:href="@{/ogretmen/yoklama/{id}(id=${oturum.id})}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-eye"></i> Detay
-                            </a>
+                        <td data-label="Saat" th:text="${#temporals.format(oturum.baslangicZamani, 'HH:mm')}"></td>
+                        <td data-label="Katılım">
+                            <span class="badge badge-info" th:text="${oturum.kayitlar.size()} + ' Öğrenci'"></span>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
     </main>
 
     <footer>
-        <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+        <div class="container">
+            <p>&copy; 2026 Adıyaman Üniversitesi - Öğretmen Modülü</p>
+        </div>
     </footer>
+
 </body>
 
 </html>

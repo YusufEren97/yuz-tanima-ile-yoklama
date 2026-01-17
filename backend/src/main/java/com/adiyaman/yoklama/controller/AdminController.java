@@ -35,6 +35,7 @@ public class AdminController {
 
     @PostMapping("/bolumler/ekle")
     public String bolumEkle(@RequestParam String ad, @RequestParam String kod,
+            @RequestParam(required = false, defaultValue = "0") int sinifSayisi,
             RedirectAttributes redirect) {
         if (bolumService.kodMevcutMu(kod)) {
             redirect.addFlashAttribute("hata", "Bu bölüm kodu zaten mevcut!");
@@ -42,7 +43,20 @@ public class AdminController {
         }
         Bolum bolum = Bolum.builder().ad(ad).kod(kod).build();
         bolumService.kaydet(bolum);
-        redirect.addFlashAttribute("mesaj", "Bölüm eklendi: " + ad);
+
+        // Otomatik sinif olusturma
+        if (sinifSayisi > 0) {
+            for (int i = 1; i <= sinifSayisi; i++) {
+                Sinif sinif = Sinif.builder()
+                        .ad(i + ". Sınıf")
+                        .bolum(bolum)
+                        .build();
+                bolumService.sinifKaydet(sinif);
+            }
+        }
+
+        redirect.addFlashAttribute("mesaj",
+                "Bölüm eklendi: " + ad + (sinifSayisi > 0 ? " (" + sinifSayisi + " sınıf oluşturuldu)" : ""));
         return "redirect:/admin/bolumler";
     }
 
@@ -149,5 +163,27 @@ public class AdminController {
     public String ogrenciler(Model model) {
         model.addAttribute("ogrenciler", kullaniciService.rolIleGetir(Rol.OGRENCI));
         return "admin/ogrenciler";
+    }
+
+    // Mevcut ogrencileri siniflarinin derslerine ekle
+    @PostMapping("/ogrenciler/senkronize")
+    public String ogrencileriSenkronize(RedirectAttributes redirect) {
+        var ogrenciler = kullaniciService.rolIleGetir(Rol.OGRENCI);
+        int eklenen = 0;
+
+        for (Kullanici ogrenci : ogrenciler) {
+            if (ogrenci.getSinif() != null) {
+                var dersler = dersService.sinifaDersleriniGetir(ogrenci.getSinif().getId());
+                for (Ders ders : dersler) {
+                    if (!ders.getOgrenciler().contains(ogrenci)) {
+                        dersService.ogrenciEkle(ders.getId(), ogrenci);
+                        eklenen++;
+                    }
+                }
+            }
+        }
+
+        redirect.addFlashAttribute("mesaj", "Senkronizasyon tamamlandi. " + eklenen + " kayit eklendi.");
+        return "redirect:/admin/ogrenciler";
     }
 }
