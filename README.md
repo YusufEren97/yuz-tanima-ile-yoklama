@@ -86,7 +86,7 @@ yuz-tanima-ile-yoklama/
 ```
 
 ## 👥 Katkıda Bulunanlar
-*   **Yusuf Eren Seyrek** - *Full Stack Developer*
+*   **Yusuf Eren Seyrek** - **Mehmet Delin**
 
 ## 📄 Lisans
 Bu proje Adıyaman Üniversitesi Bitirme Projesi kapsamında geliştirilmiştir.
