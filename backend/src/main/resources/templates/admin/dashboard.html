@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Yoklama Sistemi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a th:href="@{/admin}">🎓 Adıyaman Üniversitesi - Admin</a>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/admin}">Dashboard</a>
+            <a th:href="@{/admin/bolumler}">Bölümler</a>
+            <a th:href="@{/admin/dersler}">Dersler</a>
+            <a th:href="@{/admin/ogretmenler}">Öğretmenler</a>
+            <a th:href="@{/admin/ogrenciler}">Öğrenciler</a>
+            <a th:href="@{/cikis}" class="btn-logout">Çıkış</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>📊 Admin Dashboard</h1>
+
+        <div th:if="${mesaj}" class="alert alert-success" th:text="${mesaj}"></div>
+        <div th:if="${hata}" class="alert alert-error" th:text="${hata}"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👨‍🏫</div>
+                <div class="stat-info">
+                    <span class="stat-value" th:text="${ogretmenSayisi}">0</span>
+                    <span class="stat-label">Öğretmen</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👨‍🎓</div>
+                <div class="stat-info">
+                    <span class="stat-value" th:text="${ogrenciSayisi}">0</span>
+                    <span class="stat-label">Öğrenci</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏛️</div>
+                <div class="stat-info">
+                    <span class="stat-value" th:text="${bolumSayisi}">0</span>
+                    <span class="stat-label">Bölüm</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-info">
+                    <span class="stat-value" th:text="${dersSayisi}">0</span>
+                    <span class="stat-label">Ders</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h2>Hızlı İşlemler</h2>
+            <div class="action-buttons">
+                <a th:href="@{/admin/bolumler}" class="btn btn-secondary">➕ Bölüm Ekle</a>
+                <a th:href="@{/admin/dersler}" class="btn btn-secondary">➕ Ders Ekle</a>
+                <a th:href="@{/admin/ogretmenler}" class="btn btn-secondary">➕ Öğretmen Ekle</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+    </footer>
+</body>
+
+</html>

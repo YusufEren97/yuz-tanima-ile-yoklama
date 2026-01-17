@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yüz Kaydı - Yoklama Sistemi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a th:href="@{/ogrenci}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi - Öğrenci</a>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/ogrenci}"><i class="fas fa-home"></i> Ana Sayfa</a>
+            <a th:href="@{/ogrenci/yuz-kayit}" class="active"><i class="fas fa-camera"></i> Yüz Kaydı</a>
+            <a th:href="@{/ogrenci/gecmis}"><i class="fas fa-history"></i> Geçmişim</a>
+            <a th:href="@{/cikis}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1><i class="fas fa-camera"></i> Yüz Kaydı</h1>
+
+        <div th:if="${mesaj}" class="alert alert-success"><i class="fas fa-check-circle"></i> <span
+                th:text="${mesaj}"></span></div>
+        <div th:if="${hata}" class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <span
+                th:text="${hata}"></span></div>
+
+        <div class="card">
+            <h2>
+                <span th:if="${yuzKayitli}"><i class="fas fa-sync"></i> Yüz Güncelle</span>
+                <span th:unless="${yuzKayitli}"><i class="fas fa-user-plus"></i> Yüz Kaydet</span>
+            </h2>
+
+            <div th:if="${yuzKayitli}" class="alert alert-success" style="margin-bottom: 1rem;">
+                <i class="fas fa-check-circle"></i> Yüzünüz kayıtlı! Güncellemek isterseniz aşağıdan yeni fotoğraflar
+                çekebilirsiniz.
+            </div>
+
+            <div class="camera-container">
+                <div class="camera-view">
+                    <video id="video" autoplay playsinline></video>
+                </div>
+
+                <div class="photo-grid" id="photoGrid">
+                    <div class="photo-placeholder"><i class="fas fa-image"></i></div>
+                    <div class="photo-placeholder"><i class="fas fa-image"></i></div>
+                    <div class="photo-placeholder"><i class="fas fa-image"></i></div>
+                    <div class="photo-placeholder"><i class="fas fa-image"></i></div>
+                    <div class="photo-placeholder"><i class="fas fa-image"></i></div>
+                </div>
+
+                <div class="capture-controls">
+                    <button type="button" id="captureBtn" class="btn btn-primary">
+                        <i class="fas fa-camera"></i> Fotoğraf Çek (<span id="photoCount">0</span>/5)
+                    </button>
+                    <button type="button" id="resetBtn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-redo"></i> Sıfırla
+                    </button>
+                </div>
+
+                <form id="uploadForm" th:action="${yuzKayitli ? '/ogrenci/yuz-guncelle' : '/ogrenci/yuz-kayit'}"
+                    method="post" enctype="multipart/form-data" style="display: none;">
+                    <input type="file" name="fotograflar" id="photoInput" multiple accept="image/*">
+                </form>
+
+                <button type="button" id="saveBtn" class="btn btn-success btn-lg btn-block" style="margin-top: 1rem;"
+                    disabled>
+                    <i class="fas fa-save"></i>
+                    <span th:if="${yuzKayitli}">Güncelle</span>
+                    <span th:unless="${yuzKayitli}">Kaydet</span>
+                </button>
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 1rem;">
+                <i class="fas fa-info-circle"></i>
+                <strong>İpuçları:</strong>
+                <ul style="margin: 0.5rem 0 0 1rem;">
+                    <li>Yüzünüzü kameraya net gösterin</li>
+                    <li>5 farklı açıdan fotoğraf çekin</li>
+                    <li>İyi aydınlatılmış bir ortamda olun</li>
+                    <li>Her fotoğrafta sadece sizin yüzünüz olsun</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+    </footer>
+
+    <style>
+        .photo-placeholder {
+            aspect-ratio: 1;
+            background: var(--gray-light);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            font-size: 1.5rem;
+        }
+
+        .photo-grid img {
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+    </style>
+
+    <script>
+        const video = document.getElementById('video');
+        const captureBtn = document.getElementById('captureBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const photoGrid = document.getElementById('photoGrid');
+        const photoCount = document.getElementById('photoCount');
+        const uploadForm = document.getElementById('uploadForm');
+        const photoInput = document.getElementById('photoInput');
+
+        let photos = [];
+        let stream = null;
+
+        // Kamerayı başlat
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: 640, height: 480 }
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                alert('Kamera erişimi sağlanamadı: ' + err.message);
+            }
+        }
+
+        // Fotoğraf çek
+        function capturePhoto() {
+            if (photos.length >= 5) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            canvas.toBlob(blob => {
+                photos.push(blob);
+                updateUI();
+            }, 'image/jpeg', 0.9);
+        }
+
+        // UI güncelle
+        function updateUI() {
+            photoCount.textContent = photos.length;
+
+            // Grid güncelle
+            photoGrid.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                if (photos[i]) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(photos[i]);
+                    img.className = 'captured';
+                    photoGrid.appendChild(img);
+                } else {
+                    const div = document.createElement('div');
+                    div.className = 'photo-placeholder';
+                    div.innerHTML = '<i class="fas fa-image"></i>';
+                    photoGrid.appendChild(div);
+                }
+            }
+
+            resetBtn.disabled = photos.length === 0;
+            saveBtn.disabled = photos.length < 5;
+            captureBtn.disabled = photos.length >= 5;
+        }
+
+        // Sıfırla
+        function reset() {
+            photos = [];
+            updateUI();
+        }
+
+        // Kaydet
+        async function save() {
+            if (photos.length < 5) return;
+
+            const formData = new FormData();
+            photos.forEach((photo, i) => {
+                formData.append('fotograflar', photo, `photo_${i}.jpg`);
+            });
+
+            // Form action URL'ini al
+            const actionUrl = uploadForm.action;
+
+            try {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...';
+
+                const response = await fetch(actionUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.reload();
+                }
+            } catch (err) {
+                alert('Kayıt sırasında hata oluştu: ' + err.message);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Kaydet';
+            }
+        }
+
+        captureBtn.addEventListener('click', capturePhoto);
+        resetBtn.addEventListener('click', reset);
+        saveBtn.addEventListener('click', save);
+
+        startCamera();
+    </script>
+</body>
+
+</html>

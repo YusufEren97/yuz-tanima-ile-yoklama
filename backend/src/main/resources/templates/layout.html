@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - Yoklama Sistemi' : 'Yoklama Sistemi'}">Yoklama Sistemi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar" th:if="${#authorization.expression('isAuthenticated()')}">
+        <div class="nav-brand">
+            <a th:href="@{/anasayfa}">🎓 Adıyaman Üniversitesi - Yoklama</a>
+        </div>
+        <div class="nav-links">
+            <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <a th:href="@{/admin}">Dashboard</a>
+                <a th:href="@{/admin/bolumler}">Bölümler</a>
+                <a th:href="@{/admin/dersler}">Dersler</a>
+                <a th:href="@{/admin/ogretmenler}">Öğretmenler</a>
+            </span>
+            <span th:if="${#authorization.expression('hasRole(''OGRETMEN'')')}">
+                <a th:href="@{/ogretmen}">Derslerim</a>
+                <a th:href="@{/ogretmen/gecmis}">Yoklama Geçmişi</a>
+            </span>
+            <span th:if="${#authorization.expression('hasRole(''OGRENCI'')')}">
+                <a th:href="@{/ogrenci}">Ana Sayfa</a>
+                <a th:href="@{/ogrenci/yuz-kayit}">Yüz Kaydı</a>
+                <a th:href="@{/ogrenci/gecmis}">Geçmişim</a>
+            </span>
+            <a th:href="@{/cikis}" class="btn-logout">Çıkış</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div th:if="${mesaj}" class="alert alert-success" th:text="${mesaj}"></div>
+        <div th:if="${hata}" class="alert alert-error" th:text="${hata}"></div>
+        
+        <div th:replace="~{${content} :: content}"></div>
+    </main>
+
+    <footer>
+        <p>© 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+    </footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

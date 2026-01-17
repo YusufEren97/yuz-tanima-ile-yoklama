@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Yoklama Sistemi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1><i class="fas fa-user-graduate"></i> Öğrenci Kaydı</h1>
+                <h2>Yüz Tanıma ile Yoklama Sistemi</h2>
+            </div>
+
+            <div th:if="${hata}" class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <span
+                    th:text="${hata}"></span></div>
+
+            <form th:action="@{/kayit}" method="post" class="auth-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ad"><i class="fas fa-user"></i> Ad</label>
+                        <input type="text" id="ad" name="ad" required placeholder="Adınız">
+                    </div>
+                    <div class="form-group">
+                        <label for="soyad"><i class="fas fa-user"></i> Soyad</label>
+                        <input type="text" id="soyad" name="soyad" required placeholder="Soyadınız">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ogrenciNo"><i class="fas fa-id-card"></i> Öğrenci Numarası</label>
+                    <input type="text" id="ogrenciNo" name="ogrenciNo" required placeholder="Örn: 2021123456">
+                </div>
+
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" name="email" required placeholder="ornek@adiyaman.edu.tr">
+                </div>
+
+                <div class="form-group">
+                    <label for="sifre"><i class="fas fa-lock"></i> Şifre</label>
+                    <input type="password" id="sifre" name="sifre" required minlength="6"
+                        placeholder="En az 6 karakter">
+                </div>
+
+                <div class="form-group">
+                    <label for="bolumId"><i class="fas fa-building"></i> Bölüm</label>
+                    <select id="bolumId" name="bolumId" required>
+                        <option value="">Bölüm Seçin</option>
+                        <option th:each="bolum : ${bolumler}" th:value="${bolum.id}" th:text="${bolum.ad}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sinifId"><i class="fas fa-door-open"></i> Sınıf</label>
+                    <select id="sinifId" name="sinifId" required>
+                        <option value="">Sınıf Seçin</option>
+                        <option th:each="sinif : ${siniflar}" th:value="${sinif.id}"
+                            th:text="${sinif.bolum.ad + ' - ' + sinif.ad}"></option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i> Kayıt Ol
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Zaten hesabınız var mı? <a th:href="@{/giris}"><i class="fas fa-sign-in-alt"></i> Giriş Yap</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoklama Geçmişim - Yoklama Sistemi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a th:href="@{/ogrenci}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi - Öğrenci</a>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/ogrenci}"><i class="fas fa-home"></i> Ana Sayfa</a>
+            <a th:href="@{/ogrenci/yuz-kayit}"><i class="fas fa-camera"></i> Yüz Kaydı</a>
+            <a th:href="@{/ogrenci/gecmis}" class="active"><i class="fas fa-history"></i> Geçmişim</a>
+            <a th:href="@{/cikis}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1><i class="fas fa-history"></i> Yoklama Geçmişim</h1>
+
+        <div class="card">
+            <div th:if="${kayitlar.isEmpty()}" class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Henüz yoklama kaydınız bulunmuyor.
+            </div>
+            <table th:unless="${kayitlar.isEmpty()}" class="table">
+                <thead>
+                    <tr>
+                        <th>Ders</th>
+                        <th>Tarih</th>
+                        <th>Katılım Saati</th>
+                        <th>Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="kayit : ${kayitlar}">
+                        <td>
+                            <strong th:text="${kayit.oturum.ders.ad}"></strong>
+                            <br><small th:text="${kayit.oturum.ders.kod}" style="color: var(--gray);"></small>
+                        </td>
+                        <td th:text="${#temporals.format(kayit.katilimZamani, 'dd.MM.yyyy')}"></td>
+                        <td th:text="${#temporals.format(kayit.katilimZamani, 'HH:mm:ss')}"></td>
+                        <td>
+                            <span th:if="${kayit.katildi}" class="badge badge-success">
+                                <i class="fas fa-check"></i> Katıldı
+                            </span>
+                            <span th:unless="${kayit.katildi}" class="badge badge-danger">
+                                <i class="fas fa-times"></i> Katılmadı
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+    </footer>
+</body>
+
+</html>

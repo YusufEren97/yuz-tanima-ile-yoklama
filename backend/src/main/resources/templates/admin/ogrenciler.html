@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Listesi - Yoklama Sistemi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a th:href="@{/admin}">🎓 Adıyaman Üniversitesi - Admin</a>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/admin}">Dashboard</a>
+            <a th:href="@{/admin/bolumler}">Bölümler</a>
+            <a th:href="@{/admin/dersler}">Dersler</a>
+            <a th:href="@{/admin/ogretmenler}">Öğretmenler</a>
+            <a th:href="@{/admin/ogrenciler}" class="active">Öğrenciler</a>
+            <a th:href="@{/cikis}" class="btn-logout">Çıkış</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>👨‍🎓 Öğrenci Listesi</h1>
+
+        <div class="card">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Öğrenci No</th>
+                        <th>Ad Soyad</th>
+                        <th>Email</th>
+                        <th>Bölüm</th>
+                        <th>Sınıf</th>
+                        <th>Yüz Kaydı</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ogrenci : ${ogrenciler}">
+                        <td th:text="${ogrenci.ogrenciNo}"></td>
+                        <td th:text="${ogrenci.tamAd}"></td>
+                        <td th:text="${ogrenci.email}"></td>
+                        <td th:text="${ogrenci.bolum != null ? ogrenci.bolum.ad : '-'}"></td>
+                        <td th:text="${ogrenci.sinif != null ? ogrenci.sinif.ad : '-'}"></td>
+                        <td>
+                            <span th:if="${ogrenci.yuzKayitli}" class="badge badge-success">✓ Kayıtlı</span>
+                            <span th:unless="${ogrenci.yuzKayitli}" class="badge badge-warning">✗ Kayıtsız</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+    </footer>
+</body>
+
+</html>

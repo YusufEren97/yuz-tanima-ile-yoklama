@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğretmen Yönetimi - Yoklama Sistemi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a th:href="@{/admin}">🎓 Adıyaman Üniversitesi - Admin</a>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/admin}">Dashboard</a>
+            <a th:href="@{/admin/bolumler}">Bölümler</a>
+            <a th:href="@{/admin/dersler}">Dersler</a>
+            <a th:href="@{/admin/ogretmenler}" class="active">Öğretmenler</a>
+            <a th:href="@{/cikis}" class="btn-logout">Çıkış</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>👨‍🏫 Öğretmen Yönetimi</h1>
+
+        <div th:if="${mesaj}" class="alert alert-success" th:text="${mesaj}"></div>
+        <div th:if="${hata}" class="alert alert-error" th:text="${hata}"></div>
+
+        <!-- Yeni Öğretmen Ekle -->
+        <div class="card">
+            <h2>Yeni Öğretmen Ekle</h2>
+            <form th:action="@{/admin/ogretmenler/ekle}" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ad</label>
+                        <input type="text" name="ad" placeholder="Ad" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Soyad</label>
+                        <input type="text" name="soyad" placeholder="Soyad" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="ornek@adiyaman.edu.tr" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Şifre</label>
+                        <input type="password" name="sifre" placeholder="Şifre" required minlength="6">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Öğretmen Ekle</button>
+            </form>
+        </div>
+
+        <!-- Öğretmen Listesi -->
+        <div class="card">
+            <h2>Mevcut Öğretmenler</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ad Soyad</th>
+                        <th>Email</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="ogretmen : ${ogretmenler}">
+                        <td th:text="${ogretmen.tamAd}"></td>
+                        <td th:text="${ogretmen.email}"></td>
+                        <td>
+                            <span th:if="${ogretmen.aktif}" class="badge badge-success">Aktif</span>
+                            <span th:unless="${ogretmen.aktif}" class="badge badge-danger">Pasif</span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/ogretmenler/sil/{id}(id=${ogretmen.id})}" method="post"
+                                style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Bu öğretmeni silmek istediğinize emin misiniz?')">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+    </footer>
+</body>
+
+</html>

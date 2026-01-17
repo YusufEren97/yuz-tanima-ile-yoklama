@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derslerim - Yoklama Sistemi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a th:href="@{/ogretmen}"><i class="fas fa-graduation-cap"></i> Adıyaman Üniversitesi - Öğretmen</a>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/ogretmen}" class="active"><i class="fas fa-book"></i> Derslerim</a>
+            <a th:href="@{/ogretmen/gecmis}"><i class="fas fa-history"></i> Yoklama Geçmişi</a>
+            <a th:href="@{/cikis}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1><i class="fas fa-chalkboard"></i> Hoş Geldiniz, <span th:text="${ogretmen.tamAd}"></span></h1>
+
+        <div th:if="${mesaj}" class="alert alert-success"><i class="fas fa-check-circle"></i> <span
+                th:text="${mesaj}"></span></div>
+        <div th:if="${hata}" class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <span
+                th:text="${hata}"></span></div>
+
+        <!-- Aktif Yoklamalar -->
+        <div th:if="${!aktifOturumlar.isEmpty()}" class="card">
+            <h2><i class="fas fa-clock"></i> Aktif Yoklamalar</h2>
+            <div class="course-grid">
+                <div th:each="oturum : ${aktifOturumlar}" class="course-card" style="border-left: 4px solid #28a745;">
+                    <h3 th:text="${oturum.ders.ad}"></h3>
+                    <p class="course-code" th:text="${oturum.ders.kod}"></p>
+                    <p class="course-info">
+                        <i class="fas fa-play-circle"></i> Başlangıç:
+                        <span th:text="${#temporals.format(oturum.baslangicZamani, 'HH:mm')}"></span>
+                    </p>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a th:href="@{/ogretmen/yoklama/{id}(id=${oturum.id})}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> Görüntüle
+                        </a>
+                        <form th:action="@{/ogretmen/yoklama/bitir/{id}(id=${oturum.id})}" method="post"
+                            style="display:inline;">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-stop"></i> Bitir
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Derslerim -->
+        <div class="card">
+            <h2><i class="fas fa-book-open"></i> Derslerim</h2>
+            <div th:if="${dersler.isEmpty()}" class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Henüz size atanmış ders bulunmuyor.
+            </div>
+            <div th:unless="${dersler.isEmpty()}" class="course-grid">
+                <div th:each="ders : ${dersler}" class="course-card">
+                    <h3 th:text="${ders.ad}"></h3>
+                    <p class="course-code" th:text="${ders.kod}"></p>
+                    <p class="course-info">
+                        <i class="fas fa-users"></i> <span th:text="${ders.ogrenciler.size()}"></span> öğrenci
+                    </p>
+                    <p class="course-info" th:if="${ders.sinif != null}">
+                        <i class="fas fa-door-open"></i> <span
+                            th:text="${ders.sinif.bolum.ad + ' - ' + ders.sinif.ad}"></span>
+                    </p>
+                    <form th:action="@{/ogretmen/yoklama/baslat/{id}(id=${ders.id})}" method="post">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-play"></i> Yoklama Başlat
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+    </footer>
+</body>
+
+</html>

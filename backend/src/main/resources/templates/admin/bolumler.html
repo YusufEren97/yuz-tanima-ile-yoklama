@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bölüm Yönetimi - Yoklama Sistemi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a th:href="@{/admin}">🎓 Adıyaman Üniversitesi - Admin</a>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/admin}">Dashboard</a>
+            <a th:href="@{/admin/bolumler}" class="active">Bölümler</a>
+            <a th:href="@{/admin/dersler}">Dersler</a>
+            <a th:href="@{/admin/ogretmenler}">Öğretmenler</a>
+            <a th:href="@{/cikis}" class="btn-logout">Çıkış</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>🏛️ Bölüm Yönetimi</h1>
+
+        <div th:if="${mesaj}" class="alert alert-success" th:text="${mesaj}"></div>
+        <div th:if="${hata}" class="alert alert-error" th:text="${hata}"></div>
+
+        <!-- Yeni Bölüm Ekle -->
+        <div class="card">
+            <h2>Yeni Bölüm Ekle</h2>
+            <form th:action="@{/admin/bolumler/ekle}" method="post" class="form-inline">
+                <div class="form-group">
+                    <input type="text" name="ad" placeholder="Bölüm Adı" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="kod" placeholder="Bölüm Kodu (Örn: BILMUH)" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Ekle</button>
+            </form>
+        </div>
+
+        <!-- Bölüm Listesi -->
+        <div class="card">
+            <h2>Mevcut Bölümler</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Bölüm Adı</th>
+                        <th>Kod</th>
+                        <th>Sınıflar</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="bolum : ${bolumler}">
+                        <td th:text="${bolum.ad}"></td>
+                        <td th:text="${bolum.kod}"></td>
+                        <td>
+                            <span th:each="sinif, iter : ${bolum.siniflar}">
+                                <span th:text="${sinif.ad}"></span><span th:if="${!iter.last}">, </span>
+                            </span>
+                        </td>
+                        <td>
+                            <form th:action="@{/admin/bolumler/sil/{id}(id=${bolum.id})}" method="post"
+                                style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Bu bölümü silmek istediğinize emin misiniz?')">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sınıf Ekle -->
+        <div class="card">
+            <h2>Yeni Sınıf Ekle</h2>
+            <form th:action="@{/admin/siniflar/ekle}" method="post" class="form-inline">
+                <div class="form-group">
+                    <select name="bolumId" required>
+                        <option value="">Bölüm Seçin</option>
+                        <option th:each="bolum : ${bolumler}" th:value="${bolum.id}" th:text="${bolum.ad}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="ad" placeholder="Sınıf Adı (Örn: 1. Sınıf)" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Ekle</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Adıyaman Üniversitesi - Yüz Tanıma ile Yoklama Sistemi</p>
+    </footer>
+</body>
+
+</html>
