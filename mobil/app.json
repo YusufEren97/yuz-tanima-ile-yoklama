@@ -4,11 +4,11 @@
     "slug": "yoklama-sistemi",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#667eea"
     },
@@ -22,7 +22,7 @@
     "android": {
       "package": "com.yusuferenseyrek.yoklama",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "assets/adaptive-icon.png",
         "backgroundColor": "#667eea"
       },
       "edgeToEdgeEnabled": true,
@@ -31,12 +31,15 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "0c04b87c-6f83-4ffd-b333-4a02f2f0d4f0"
-      }
-    }
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Yoklama için yüz tanıma işlemi sırasında kamera kullanılmaktadır."
+        }
+      ]
+    ]
   }
 }
