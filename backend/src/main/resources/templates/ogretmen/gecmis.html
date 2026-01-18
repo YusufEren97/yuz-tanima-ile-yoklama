@@ -46,6 +46,7 @@
                         <th>Tarih</th>
                         <th>Saat</th>
                         <th>Katılım</th>
+                        <th>İşlem</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,6 +61,11 @@
                         <td data-label="Saat" th:text="${#temporals.format(oturum.baslangicZamani, 'HH:mm')}"></td>
                         <td data-label="Katılım">
                             <span class="badge badge-info" th:text="${oturum.kayitlar.size()} + ' Öğrenci'"></span>
+                        </td>
+                        <td data-label="İşlem">
+                            <a th:href="@{/ogretmen/yoklama/{id}(id=${oturum.id})}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> Detay
+                            </a>
                         </td>
                     </tr>
                 </tbody>

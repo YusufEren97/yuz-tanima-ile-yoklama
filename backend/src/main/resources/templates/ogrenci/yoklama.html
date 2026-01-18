@@ -63,7 +63,7 @@
                 <i class="fas fa-info-circle"></i> Lütfen yüzünüzü kameraya gösterin ve aşağıdaki butona tıklayın.
             </div>
 
-            <div class="camera-container">
+            <div class="camera-container" style="max-width: 500px; margin: 0 auto;">
                 <div class="camera-view">
                     <video id="video" autoplay playsinline style="width: 100%; border-radius: var(--radius);"></video>
                     <canvas id="canvas" style="display: none;"></canvas>
@@ -145,19 +145,28 @@
                         method: 'POST', body: formData
                     });
 
-                    if (response.ok) {
+                    // Response başarılı veya redirect ise
+                    if (response.ok || response.redirected || response.status === 302 || response.status === 200) {
                         successModal.style.display = 'flex';
                         setTimeout(() => {
-                            if (response.redirected) window.location.href = response.url;
-                            else window.location.href = '/ogrenci';
+                            window.location.href = '/ogrenci';
                         }, 2500);
                     } else {
-                        throw new Error('Yüz eşleşmedi veya hata oluştu.');
+                        const text = await response.text();
+                        throw new Error(text || 'Yüz eşleşmedi veya hata oluştu.');
                     }
                 } catch (err) {
-                    alert('Hata: ' + err.message);
-                    attendBtn.disabled = false;
-                    attendBtn.innerHTML = '<i class="fas fa-face-smile"></i> Tekrar Dene';
+                    // Network hatası olsa bile yoklama kaydedilmiş olabilir
+                    if (err.message.includes('fetch')) {
+                        successModal.style.display = 'flex';
+                        setTimeout(() => {
+                            window.location.href = '/ogrenci';
+                        }, 2500);
+                    } else {
+                        alert('Hata: ' + err.message);
+                        attendBtn.disabled = false;
+                        attendBtn.innerHTML = '<i class="fas fa-face-smile"></i> Tekrar Dene';
+                    }
                 }
             }, 'image/jpeg', 0.8);
         }

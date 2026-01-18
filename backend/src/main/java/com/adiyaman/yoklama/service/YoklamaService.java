@@ -68,6 +68,20 @@ public class YoklamaService {
         return oturumRepository.findByDersOgretmenId(ogretmenId);
     }
 
+    // Öğretmenin tüm aktif oturumlarını kapat (çıkış yaparken)
+    public void ogretmeninAktifOturumlariniKapat(Long ogretmenId) {
+        List<YoklamaOturumu> aktifOturumlar = oturumRepository.findByDersOgretmenId(ogretmenId)
+                .stream()
+                .filter(o -> Boolean.TRUE.equals(o.getAktif()))
+                .toList();
+
+        for (YoklamaOturumu oturum : aktifOturumlar) {
+            oturum.setAktif(false);
+            oturum.setBitisZamani(LocalDateTime.now());
+            oturumRepository.save(oturum);
+        }
+    }
+
     // Kayıt İşlemleri
     public YoklamaKayit katilimKaydet(YoklamaOturumu oturum, Kullanici ogrenci, Double guvenSkor) {
         // Öğrenci zaten katılmış mı kontrol et
