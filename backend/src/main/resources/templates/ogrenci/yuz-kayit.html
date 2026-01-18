@@ -269,6 +269,8 @@
                 let cleanMsg = err.message;
                 if (cleanMsg.includes('{') || cleanMsg.includes('400') || cleanMsg.includes('BAD REQUEST')) {
                     cleanMsg = 'Kayıt işlemi başarısız oldu. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.';
+                } else if (cleanMsg.includes('<html') || cleanMsg.includes('<!DOCTYPE')) {
+                    cleanMsg = 'Sunucu ile iletişimde bir sorun oluştu. Lütfen daha sonra tekrar deneyin.';
                 }
 
                 alert(cleanMsg);

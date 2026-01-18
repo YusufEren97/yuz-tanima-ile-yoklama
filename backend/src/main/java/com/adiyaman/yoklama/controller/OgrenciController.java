@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.ResponseEntity;
 
 @Controller
 @RequestMapping("/ogrenci")
@@ -56,14 +57,13 @@ public class OgrenciController {
     }
 
     @PostMapping("/yuz-kayit")
-    public String yuzKaydet(@RequestParam("fotograflar") List<MultipartFile> fotograflar,
-            Authentication auth,
-            RedirectAttributes redirect) {
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> yuzKaydet(@RequestParam("fotograflar") List<MultipartFile> fotograflar,
+            Authentication auth) {
         Kullanici ogrenci = getKullanici(auth);
 
         if (fotograflar.size() < 5) {
-            redirect.addFlashAttribute("hata", "En az 5 fotoğraf gerekli!");
-            return "redirect:/ogrenci/yuz-kayit";
+            return ResponseEntity.badRequest().body(Map.of("basarili", false, "mesaj", "En az 5 fotoğraf gerekli!"));
         }
 
         Map<String, Object> sonuc = yuzTanimaService.yuzKaydet(
@@ -73,23 +73,20 @@ public class OgrenciController {
 
         if (Boolean.TRUE.equals(sonuc.get("basarili"))) {
             kullaniciService.yuzKayitliOlarakIsaretle(ogrenci.getId());
-            redirect.addFlashAttribute("mesaj", "Yüz kaydı başarılı!");
+            return ResponseEntity.ok(Map.of("basarili", true, "mesaj", "Yüz kaydı başarılı!"));
         } else {
-            redirect.addFlashAttribute("hata", sonuc.get("mesaj"));
+            return ResponseEntity.badRequest().body(Map.of("basarili", false, "mesaj", sonuc.get("mesaj")));
         }
-
-        return "redirect:/ogrenci/yuz-kayit";
     }
 
     @PostMapping("/yuz-guncelle")
-    public String yuzGuncelle(@RequestParam("fotograflar") List<MultipartFile> fotograflar,
-            Authentication auth,
-            RedirectAttributes redirect) {
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> yuzGuncelle(@RequestParam("fotograflar") List<MultipartFile> fotograflar,
+            Authentication auth) {
         Kullanici ogrenci = getKullanici(auth);
 
         if (fotograflar.size() < 5) {
-            redirect.addFlashAttribute("hata", "En az 5 fotoğraf gerekli!");
-            return "redirect:/ogrenci/yuz-kayit";
+            return ResponseEntity.badRequest().body(Map.of("basarili", false, "mesaj", "En az 5 fotoğraf gerekli!"));
         }
 
         Map<String, Object> sonuc = yuzTanimaService.yuzGuncelle(
@@ -98,12 +95,10 @@ public class OgrenciController {
                 fotograflar);
 
         if (Boolean.TRUE.equals(sonuc.get("basarili"))) {
-            redirect.addFlashAttribute("mesaj", "Yüz güncellendi!");
+            return ResponseEntity.ok(Map.of("basarili", true, "mesaj", "Yüz güncellendi!"));
         } else {
-            redirect.addFlashAttribute("hata", sonuc.get("mesaj"));
+            return ResponseEntity.badRequest().body(Map.of("basarili", false, "mesaj", sonuc.get("mesaj")));
         }
-
-        return "redirect:/ogrenci/yuz-kayit";
     }
 
     @PostMapping("/yuz-sil")
@@ -143,21 +138,19 @@ public class OgrenciController {
     }
 
     @PostMapping("/yoklama/{oturumId}")
-    public String yoklamaKatil(@PathVariable Long oturumId,
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> yoklamaKatil(@PathVariable Long oturumId,
             @RequestParam("fotograf") MultipartFile fotograf,
-            Authentication auth,
-            RedirectAttributes redirect) {
+            Authentication auth) {
         Kullanici ogrenci = getKullanici(auth);
         YoklamaOturumu oturum = yoklamaService.oturumIdIleBul(oturumId).orElse(null);
 
         if (oturum == null || !oturum.getAktif()) {
-            redirect.addFlashAttribute("hata", "Yoklama oturumu aktif değil!");
-            return "redirect:/ogrenci";
+            return ResponseEntity.badRequest().body(Map.of("basarili", false, "mesaj", "Yoklama oturumu aktif değil!"));
         }
 
         if (!ogrenci.getYuzKayitli()) {
-            redirect.addFlashAttribute("hata", "Önce yüz kaydı yapmalısınız!");
-            return "redirect:/ogrenci/yuz-kayit";
+            return ResponseEntity.badRequest().body(Map.of("basarili", false, "mesaj", "Önce yüz kaydı yapmalısınız!"));
         }
 
         // Yüz doğrulama
@@ -166,12 +159,10 @@ public class OgrenciController {
         if (Boolean.TRUE.equals(sonuc.get("basarili"))) {
             Double guvenSkor = sonuc.get("guven") != null ? ((Number) sonuc.get("guven")).doubleValue() : null;
             yoklamaService.katilimKaydet(oturum, ogrenci, guvenSkor);
-            redirect.addFlashAttribute("mesaj", "Yoklamaya katılım kaydedildi!");
+            return ResponseEntity.ok(Map.of("basarili", true, "mesaj", "Yoklamaya katılım kaydedildi!"));
         } else {
-            redirect.addFlashAttribute("hata", "Yüz doğrulanamadı: " + sonuc.get("mesaj"));
+            return ResponseEntity.badRequest().body(Map.of("basarili", false, "mesaj", sonuc.get("mesaj")));
         }
-
-        return "redirect:/ogrenci";
     }
 
     @GetMapping("/gecmis")
