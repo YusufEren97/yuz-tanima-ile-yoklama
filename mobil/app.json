@@ -40,6 +40,11 @@
           "cameraPermission": "Yoklama için yüz tanıma işlemi sırasında kamera kullanılmaktadır."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "0c04b87c-6f83-4ffd-b333-4a02f2f0d4f0"
+      }
+    }
   }
 }
