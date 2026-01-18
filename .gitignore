@@ -26,7 +26,6 @@ python-yuz-servisi/venv/
 
 # General
 **/*.jpg
-**/*.png
 !backend/src/main/resources/static/images/**
 !backend/src/main/resources/static/assets/**
 
@@ -39,6 +38,3 @@ Thumbs.db
 
 # Database files (local)
 *.db
-
-# Mobile App (Local only)
-mobil/
