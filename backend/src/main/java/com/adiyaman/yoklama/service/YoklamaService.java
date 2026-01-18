@@ -65,12 +65,13 @@ public class YoklamaService {
     }
 
     public List<YoklamaOturumu> ogretmeninOturumlariniGetir(Long ogretmenId) {
-        return oturumRepository.findByDersOgretmenId(ogretmenId);
+        return oturumRepository.findByDersOgretmenIdOrderByBaslangicZamaniDesc(ogretmenId);
     }
 
     // Öğretmenin tüm aktif oturumlarını kapat (çıkış yaparken)
     public void ogretmeninAktifOturumlariniKapat(Long ogretmenId) {
-        List<YoklamaOturumu> aktifOturumlar = oturumRepository.findByDersOgretmenId(ogretmenId)
+        List<YoklamaOturumu> aktifOturumlar = oturumRepository
+                .findByDersOgretmenIdOrderByBaslangicZamaniDesc(ogretmenId)
                 .stream()
                 .filter(o -> Boolean.TRUE.equals(o.getAktif()))
                 .toList();

@@ -18,5 +18,5 @@ public interface YoklamaOturumuRepository extends JpaRepository<YoklamaOturumu, 
 
     List<YoklamaOturumu> findByAktifTrue();
 
-    List<YoklamaOturumu> findByDersOgretmenId(Long ogretmenId);
+    List<YoklamaOturumu> findByDersOgretmenIdOrderByBaslangicZamaniDesc(Long ogretmenId);
 }

@@ -9,8 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -69,18 +68,34 @@ public class OgretmenController {
 
         Ders ders = oturum.getDers();
         List<YoklamaKayit> kayitlar = yoklamaService.oturumunKayitlariniGetir(oturumId);
-        Set<Long> katilanlariIdleri = kayitlar.stream()
-                .map(k -> k.getOgrenci().getId())
-                .collect(Collectors.toSet());
+        // Kayıtları Map'e çevir (OgrenciID -> Kayit) hızlı erişim için
+        Map<Long, YoklamaKayit> kayitMap = kayitlar.stream()
+                .collect(Collectors.toMap(k -> k.getOgrenci().getId(), k -> k));
 
-        List<Kullanici> katilmayanlar = ders.getOgrenciler().stream()
-                .filter(o -> !katilanlariIdleri.contains(o.getId()))
-                .collect(Collectors.toList());
+        // Tüm öğrencileri tek bir listede birleştir
+        List<Map<String, Object>> tamListe = new ArrayList<>();
+
+        for (Kullanici ogr : ders.getOgrenciler()) {
+            Map<String, Object> satir = new HashMap<>();
+            satir.put("ogrenci", ogr);
+
+            if (kayitMap.containsKey(ogr.getId())) {
+                satir.put("katildi", true);
+                satir.put("zaman", kayitMap.get(ogr.getId()).getKatilimZamani());
+            } else {
+                satir.put("katildi", false);
+                satir.put("zaman", null);
+            }
+            tamListe.add(satir);
+        }
+
+        // Öğrenci numarasına göre sırala
+        tamListe.sort(Comparator.comparing(m -> ((Kullanici) m.get("ogrenci")).getOgrenciNo()));
 
         model.addAttribute("oturum", oturum);
         model.addAttribute("ders", ders);
-        model.addAttribute("kayitlar", kayitlar);
-        model.addAttribute("katilmayanlar", katilmayanlar);
+        model.addAttribute("tamListe", tamListe); // Yeni ana liste
+        model.addAttribute("kayitlar", kayitlar); // İstatistik için kalsın
         model.addAttribute("toplamOgrenci", ders.getOgrenciler().size());
 
         return "ogretmen/yoklama";

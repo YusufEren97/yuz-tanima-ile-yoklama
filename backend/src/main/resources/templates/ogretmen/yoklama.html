@@ -67,7 +67,8 @@
         </div>
 
         <div class="d-flex justify-between align-center mb-3">
-            <h3><i class="fas fa-users"></i> Katılan Öğrenciler (<span th:text="${kayitlar.size()}"></span>)</h3>
+            <h3><i class="fas fa-list"></i> Sınıf Listesi (<span th:text="${kayitlar.size()}"></span>/<span
+                    th:text="${toplamOgrenci}"></span>)</h3>
             <div th:if="${oturum.aktif}" class="text-muted" style="font-size: 0.9rem;">
                 <i class="fas fa-sync fa-spin"></i> Otomatik Yenileniyor...
             </div>
@@ -77,11 +78,11 @@
         </div>
 
         <div class="card">
-            <div th:if="${kayitlar.isEmpty()}" class="text-center text-muted" style="padding: 2rem;">
-                <p>Henüz katılan öğrenci yok.</p>
+            <div th:if="${tamListe.isEmpty()}" class="text-center text-muted" style="padding: 2rem;">
+                <p>Kayıtlı öğrenci bulunamadı.</p>
             </div>
 
-            <table th:unless="${kayitlar.isEmpty()}" class="table">
+            <table th:unless="${tamListe.isEmpty()}" class="table">
                 <thead>
                     <tr>
                         <th>Öğrenci No</th>
@@ -91,11 +92,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="kayit : ${kayitlar}">
-                        <td data-label="No" th:text="${kayit.ogrenci.ogrenciNo}"></td>
-                        <td data-label="Ad Soyad" style="font-weight: 600;" th:text="${kayit.ogrenci.tamAd}"></td>
-                        <td data-label="Saat" th:text="${#temporals.format(kayit.katilimZamani, 'HH:mm:ss')}"></td>
-                        <td data-label="Durum"><span class="badge badge-success">VAR</span></td>
+                    <tr th:each="satir : ${tamListe}">
+                        <td data-label="No" th:text="${satir.ogrenci.ogrenciNo}"></td>
+                        <td data-label="Ad Soyad" style="font-weight: 600;" th:text="${satir.ogrenci.tamAd}"></td>
+
+                        <td data-label="Saat">
+                            <span th:if="${satir.katildi}"
+                                th:text="${#temporals.format(satir.zaman, 'HH:mm:ss')}"></span>
+                            <span th:unless="${satir.katildi}">-</span>
+                        </td>
+
+                        <td data-label="Durum">
+                            <span th:if="${satir.katildi}" class="badge badge-success">VAR</span>
+                            <span th:unless="${satir.katildi}" class="badge badge-danger">YOK</span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
