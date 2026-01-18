@@ -91,6 +91,13 @@ public class AdminController {
         return "admin/dersler";
     }
 
+    @GetMapping("/dersler/olustur")
+    public String dersOlusturForm(Model model) {
+        model.addAttribute("ogretmenler", kullaniciService.ogretmenleriGetir());
+        model.addAttribute("siniflar", bolumService.tumSiniflariGetir());
+        return "admin/ders-olustur";
+    }
+
     @PostMapping("/dersler/ekle")
     public String dersEkle(@RequestParam String ad, @RequestParam String kod,
             @RequestParam(required = false) Long ogretmenId,
@@ -165,6 +172,87 @@ public class AdminController {
         return "admin/ogrenciler";
     }
 
+    @GetMapping("/ogrenciler/ekle")
+    public String ogrenciEkleForm(Model model) {
+        model.addAttribute("bolumler", bolumService.tumBolumleriGetir());
+        model.addAttribute("siniflar", bolumService.tumSiniflariGetir());
+        return "admin/ogrenci-ekle";
+    }
+
+    @PostMapping("/ogrenciler/ekle")
+    public String ogrenciEkle(@RequestParam String email, @RequestParam String sifre,
+            @RequestParam String ad, @RequestParam String soyad,
+            @RequestParam(required = false) String ogrenciNo,
+            @RequestParam(required = false) Long bolumId,
+            @RequestParam(required = false) Long sinifId,
+            RedirectAttributes redirect) {
+        if (kullaniciService.emailMevcutMu(email)) {
+            redirect.addFlashAttribute("hata", "Bu email zaten kayıtlı!");
+            return "redirect:/admin/ogrenciler/ekle";
+        }
+
+        Bolum bolum = bolumId != null ? bolumService.idIleBul(bolumId).orElse(null) : null;
+        Sinif sinif = sinifId != null ? bolumService.sinifIdIleBul(sinifId).orElse(null) : null;
+
+        Kullanici ogrenci = Kullanici.builder()
+                .email(email)
+                .sifre(sifre)
+                .ad(ad)
+                .soyad(soyad)
+                .ogrenciNo(ogrenciNo)
+                .bolum(bolum)
+                .sinif(sinif)
+                .rol(Rol.OGRENCI)
+                .aktif(true)
+                .build();
+        kullaniciService.kaydet(ogrenci);
+        redirect.addFlashAttribute("mesaj", "Öğrenci eklendi: " + ad + " " + soyad);
+        return "redirect:/admin/ogrenciler";
+    }
+
+    @GetMapping("/ogrenciler/duzenle/{id}")
+    public String ogrenciDuzenleForm(@PathVariable Long id, Model model) {
+        Kullanici ogrenci = kullaniciService.idIleBul(id).orElse(null);
+        if (ogrenci == null) {
+            return "redirect:/admin/ogrenciler";
+        }
+        model.addAttribute("ogrenci", ogrenci);
+        model.addAttribute("bolumler", bolumService.tumBolumleriGetir());
+        model.addAttribute("siniflar", bolumService.tumSiniflariGetir());
+        return "admin/ogrenci-duzenle";
+    }
+
+    @PostMapping("/ogrenciler/duzenle/{id}")
+    public String ogrenciDuzenle(@PathVariable Long id,
+            @RequestParam String ad, @RequestParam String soyad,
+            @RequestParam(required = false) String ogrenciNo,
+            @RequestParam(required = false) Long bolumId,
+            @RequestParam(required = false) Long sinifId,
+            RedirectAttributes redirect) {
+        Kullanici ogrenci = kullaniciService.idIleBul(id).orElse(null);
+        if (ogrenci == null) {
+            redirect.addFlashAttribute("hata", "Öğrenci bulunamadı!");
+            return "redirect:/admin/ogrenciler";
+        }
+
+        ogrenci.setAd(ad);
+        ogrenci.setSoyad(soyad);
+        ogrenci.setOgrenciNo(ogrenciNo);
+        ogrenci.setBolum(bolumId != null ? bolumService.idIleBul(bolumId).orElse(null) : null);
+        ogrenci.setSinif(sinifId != null ? bolumService.sinifIdIleBul(sinifId).orElse(null) : null);
+        kullaniciService.kaydet(ogrenci);
+
+        redirect.addFlashAttribute("mesaj", "Öğrenci güncellendi: " + ad + " " + soyad);
+        return "redirect:/admin/ogrenciler";
+    }
+
+    @PostMapping("/ogrenciler/sil/{id}")
+    public String ogrenciSil(@PathVariable Long id, RedirectAttributes redirect) {
+        kullaniciService.sil(id);
+        redirect.addFlashAttribute("mesaj", "Öğrenci silindi.");
+        return "redirect:/admin/ogrenciler";
+    }
+
     // Mevcut ogrencileri siniflarinin derslerine ekle
     @PostMapping("/ogrenciler/senkronize")
     public String ogrencileriSenkronize(RedirectAttributes redirect) {
@@ -185,5 +273,47 @@ public class AdminController {
 
         redirect.addFlashAttribute("mesaj", "Senkronizasyon tamamlandi. " + eklenen + " kayit eklendi.");
         return "redirect:/admin/ogrenciler";
+    }
+
+    // === DERS DÜZENLEME ===
+    @GetMapping("/dersler/ekle")
+    public String dersEkleForm(Model model) {
+        model.addAttribute("ogretmenler", kullaniciService.ogretmenleriGetir());
+        model.addAttribute("siniflar", bolumService.tumSiniflariGetir());
+        return "admin/ders-olustur";
+    }
+
+    @GetMapping("/dersler/duzenle/{id}")
+    public String dersDuzenleForm(@PathVariable Long id, Model model) {
+        Ders ders = dersService.idIleBul(id).orElse(null);
+        if (ders == null) {
+            return "redirect:/admin/dersler";
+        }
+        model.addAttribute("ders", ders);
+        model.addAttribute("ogretmenler", kullaniciService.ogretmenleriGetir());
+        model.addAttribute("siniflar", bolumService.tumSiniflariGetir());
+        return "admin/ders-duzenle";
+    }
+
+    @PostMapping("/dersler/duzenle/{id}")
+    public String dersDuzenle(@PathVariable Long id,
+            @RequestParam String ad, @RequestParam String kod,
+            @RequestParam(required = false) Long ogretmenId,
+            @RequestParam(required = false) Long sinifId,
+            RedirectAttributes redirect) {
+        Ders ders = dersService.idIleBul(id).orElse(null);
+        if (ders == null) {
+            redirect.addFlashAttribute("hata", "Ders bulunamadı!");
+            return "redirect:/admin/dersler";
+        }
+
+        ders.setAd(ad);
+        ders.setKod(kod);
+        ders.setOgretmen(ogretmenId != null ? kullaniciService.idIleBul(ogretmenId).orElse(null) : null);
+        ders.setSinif(sinifId != null ? bolumService.sinifIdIleBul(sinifId).orElse(null) : null);
+        dersService.kaydet(ders);
+
+        redirect.addFlashAttribute("mesaj", "Ders güncellendi: " + ad);
+        return "redirect:/admin/dersler";
     }
 }

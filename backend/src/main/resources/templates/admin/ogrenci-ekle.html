@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Ekle - Admin Paneli</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a th:href="@{/admin}"><i class="fas fa-user-shield"></i> Admin Paneli</a>
+            </div>
+            <div class="nav-links">
+                <a th:href="@{/admin}"><i class="fas fa-home"></i> Dashboard</a>
+                <a th:href="@{/admin/bolumler}"><i class="fas fa-building"></i> Bölümler</a>
+                <a th:href="@{/admin/ogrenciler}" class="active"><i class="fas fa-user-graduate"></i> Öğrenciler</a>
+                <a th:href="@{/admin/ogretmenler}"><i class="fas fa-chalkboard-teacher"></i> Öğretmenler</a>
+                <a th:href="@{/admin/dersler}"><i class="fas fa-book"></i> Dersler</a>
+                <a th:href="@{/cikis}" class="desktop-only btn-logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="d-flex justify-between align-center mb-4">
+            <h1><i class="fas fa-user-plus"></i> Yeni Öğrenci Ekle</h1>
+            <a th:href="@{/admin/ogrenciler}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Geri Dön
+            </a>
+        </div>
+
+        <div th:if="${hata}" class="mb-4 text-danger"
+            style="background: var(--danger-bg); padding: 1rem; border-radius: var(--radius);">
+            <span th:text="${hata}"></span>
+        </div>
+
+        <div class="card">
+            <form th:action="@{/admin/ogrenciler/ekle}" method="post">
+                <div class="form-group">
+                    <label for="ad"><i class="fas fa-user"></i> Ad</label>
+                    <input type="text" id="ad" name="ad" class="form-control" required placeholder="Örn: Ahmet">
+                </div>
+
+                <div class="form-group">
+                    <label for="soyad"><i class="fas fa-user"></i> Soyad</label>
+                    <input type="text" id="soyad" name="soyad" class="form-control" required placeholder="Örn: Yılmaz">
+                </div>
+
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" name="email" class="form-control" required
+                        placeholder="Örn: ahmet@ogrenci.edu.tr">
+                </div>
+
+                <div class="form-group">
+                    <label for="sifre"><i class="fas fa-lock"></i> Şifre</label>
+                    <input type="password" id="sifre" name="sifre" class="form-control" required
+                        placeholder="En az 6 karakter">
+                </div>
+
+                <div class="form-group">
+                    <label for="ogrenciNo"><i class="fas fa-id-card"></i> Öğrenci No</label>
+                    <input type="text" id="ogrenciNo" name="ogrenciNo" class="form-control" placeholder="Örn: 2024001">
+                </div>
+
+                <div class="form-group">
+                    <label for="bolumId"><i class="fas fa-building"></i> Bölüm</label>
+                    <select id="bolumId" name="bolumId" class="form-control">
+                        <option value="">-- Bölüm Seçin (Opsiyonel) --</option>
+                        <option th:each="bolum : ${bolumler}" th:value="${bolum.id}" th:text="${bolum.ad}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sinifId"><i class="fas fa-users"></i> Sınıf</label>
+                    <select id="sinifId" name="sinifId" class="form-control">
+                        <option value="">-- Sınıf Seçin (Opsiyonel) --</option>
+                        <option th:each="sinif : ${siniflar}" th:value="${sinif.id}"
+                            th:text="${sinif.bolum.ad + ' - ' + sinif.ad}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="d-flex justify-end mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Öğrenci Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Admin Paneli v2.0</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
