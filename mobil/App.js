@@ -1,34 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, StatusBar, BackHandler, ActivityIndicator, Text, Image } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { useCameraPermissions } from 'expo-camera';
 
 const BASE_URL = 'https://yoklama.yusuferenseyrek.com.tr';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [permission, requestPermission] = useCameraPermissions();
   const webViewRef = useRef(null);
 
   useEffect(() => {
-    async function init() {
-      // İzin yoksa iste
-      if (!permission?.granted) {
-        try {
-          await requestPermission();
-        } catch (e) {
-          console.warn('Permission request error:', e);
-        }
-      }
-
-      // Splash screen süresi
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 2000);
-    }
-
-    init();
-  }, []); // Sadece mount anında çalışsın, permission değişince değil (döngüyü önlemek için)
+    // Splash screen süresi
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, []);
 
   // Geri tuşu yönetimi
   useEffect(() => {
@@ -60,20 +45,7 @@ export default function App() {
     );
   }
 
-  // Kamera izni reddedildi (Loading değilse ve izin yoksa)
-  if (!isLoading && permission && !permission.granted && permission.canAskAgain === false) {
-    return (
-      <View style={styles.errorContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="#667eea" />
-        <Text style={styles.errorText}>Kamera izni gerekli!</Text>
-        <Text style={styles.errorSubText}>
-          Yoklama için kamera erişimi gereklidir. Lütfen telefon ayarlarından bu uygulamaya kamera izni verin.
-        </Text>
-      </View>
-    );
-  }
-
-  // Ana Uygulama - WebView
+  // Ana Uygulama - Saf WebView
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#667eea" />
@@ -87,6 +59,11 @@ export default function App() {
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
         allowsFullscreenVideo={true}
+        // İzin yönetimleri (Web sitesi isteyecek)
+        allowFileAccess={true}
+        allowFileAccessFromFileURLs={true}
+        allowUniversalAccessFromFileURLs={true}
+        mixedContentMode="always"
         renderLoading={() => (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#667eea" />
@@ -96,6 +73,10 @@ export default function App() {
         onError={(syntheticEvent) => {
           const { nativeEvent } = syntheticEvent;
           console.warn('WebView error: ', nativeEvent);
+        }}
+        // Kamera izni otomatik onaylanır (Web sitesi istediği sürece)
+        onPermissionRequest={(req) => {
+          req.grant(req.resources);
         }}
       />
     </View>
@@ -150,23 +131,5 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     color: '#666',
-  },
-  errorContainer: {
-    flex: 1,
-    backgroundColor: '#667eea',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  errorText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 16,
-  },
-  errorSubText: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.8)',
-    textAlign: 'center',
   },
 });
