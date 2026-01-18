@@ -1,24 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, StatusBar, BackHandler, ActivityIndicator, Text, Image } from 'react-native';
 import { WebView } from 'react-native-webview';
-import * as Camera from 'expo-camera';
+import { useCameraPermissions } from 'expo-camera';
 
 const BASE_URL = 'https://yoklama.yusuferenseyrek.com.tr';
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [hasPermission, setHasPermission] = useState(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const webViewRef = useRef(null);
 
   useEffect(() => {
-    async function requestPermissions() {
-      try {
-        // Kamera izni iste
-        const { status } = await Camera.requestCameraPermissionsAsync();
-        setHasPermission(status === 'granted');
-      } catch (e) {
-        console.warn('Camera permission error:', e);
-        setHasPermission(true); // Hatada bile devam et
+    async function init() {
+      // İzin yoksa iste
+      if (!permission?.granted) {
+        try {
+          await requestPermission();
+        } catch (e) {
+          console.warn('Permission request error:', e);
+        }
       }
 
       // Splash screen süresi
@@ -27,8 +27,8 @@ export default function App() {
       }, 2000);
     }
 
-    requestPermissions();
-  }, []);
+    init();
+  }, []); // Sadece mount anında çalışsın, permission değişince değil (döngüyü önlemek için)
 
   // Geri tuşu yönetimi
   useEffect(() => {
@@ -60,14 +60,14 @@ export default function App() {
     );
   }
 
-  // Kamera izni reddedildi
-  if (hasPermission === false) {
+  // Kamera izni reddedildi (Loading değilse ve izin yoksa)
+  if (!isLoading && permission && !permission.granted && permission.canAskAgain === false) {
     return (
       <View style={styles.errorContainer}>
         <StatusBar barStyle="light-content" backgroundColor="#667eea" />
         <Text style={styles.errorText}>Kamera izni gerekli!</Text>
         <Text style={styles.errorSubText}>
-          Yoklama için kamera erişimi gereklidir. Lütfen ayarlardan izin verin.
+          Yoklama için kamera erişimi gereklidir. Lütfen telefon ayarlarından bu uygulamaya kamera izni verin.
         </Text>
       </View>
     );
