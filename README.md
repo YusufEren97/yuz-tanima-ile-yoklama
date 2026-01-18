@@ -206,15 +206,19 @@ yuz-tanima-ile-yoklama/
 <table>
 <tr>
 <td align="center" width="50%">
-<img src="https://github.com/yusuferenseyrek.png" width="100" height="100" style="border-radius:50%"><br>
+<a href="https://github.com/YusufEren97">
+<img src="https://github.com/YusufEren97.png" width="120" height="120" style="border-radius:50%"><br>
 <strong>Yusuf Eren SEYREK</strong><br>
-<a href="https://github.com/YusufEren97">@YusufEren97</a><br>
+@YusufEren97
+</a><br>
 <sub>Backend & Yüz Tanıma</sub>
 </td>
 <td align="center" width="50%">
-<img src="https://via.placeholder.com/100/667eea/ffffff?text=MD" width="100" height="100" style="border-radius:50%"><br>
+<a href="https://github.com/Deleny">
+<img src="https://github.com/Deleny.png" width="120" height="120" style="border-radius:50%"><br>
 <strong>Mehmet DELİN</strong><br>
-<a href="#">@mehmetdelin</a><br>
+@Deleny
+</a><br>
 <sub>Frontend & Mobil</sub>
 </td>
 </tr>
