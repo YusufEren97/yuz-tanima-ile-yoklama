@@ -507,7 +507,7 @@ footer {
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 768px) {
     body {
-        padding-bottom: 70px;
+        padding-bottom: calc(60px + env(safe-area-inset-bottom));
     }
 
     /* Space for bottom nav */
@@ -630,5 +630,12 @@ footer {
         content: attr(data-label);
         font-weight: 600;
         color: var(--text-muted);
+    }
+
+    footer {
+        padding: 1rem 0;
+        margin-bottom: -1px; /* Sınır çizgisini gizlemek için */
+        background: var(--background); /* Body ile aynı renk */
+        border-top: 1px solid var(--border);
     }
 }
