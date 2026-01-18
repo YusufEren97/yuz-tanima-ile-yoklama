@@ -14,11 +14,13 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.yusuferenseyrek.yoklama",
       "infoPlist": {
         "NSCameraUsageDescription": "Yoklama için yüz tanıma işlemi sırasında kamera kullanılmaktadır."
       }
     },
     "android": {
+      "package": "com.yusuferenseyrek.yoklama",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#667eea"
