@@ -27,8 +27,7 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.CAMERA"
       ]
     },
     "web": {
@@ -41,11 +40,6 @@
           "cameraPermission": "Yoklama için yüz tanıma işlemi sırasında kamera kullanılmaktadır."
         }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "8c7ce190-c649-4965-b7f6-9cbdc6dd3f85"
-      }
-    }
+    ]
   }
 }
