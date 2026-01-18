@@ -42,9 +42,10 @@
             <p>Sisteme giriş yapabilmek için yüzünüze ait 5 adet fotoğrafı kaydetmelisiniz.</p>
         </div>
 
-        <div th:if="${mesaj}" class="mb-4 text-success"
+        <div th:if="${mesaj} or ${param.basarili}" class="mb-4 text-success"
             style="background: var(--success-bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--success);">
-            <i class="fas fa-check-circle"></i> <span th:text="${mesaj}"></span>
+            <i class="fas fa-check-circle"></i> <span
+                th:text="${mesaj != null ? mesaj : 'İşlem başarıyla tamamlandı!'}"></span>
         </div>
         <div th:if="${hata}" class="mb-4 text-danger"
             style="background: var(--danger-bg); padding: 1rem; border-radius: var(--radius); border-left: 4px solid var(--danger);">
@@ -210,15 +211,72 @@
             showPoseInstruction();
         });
 
-        uploadForm.addEventListener('submit', (e) => {
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
             if (photos.length < 5) {
-                e.preventDefault(); alert('Lütfen 5 fotoğraf çekin.'); return;
+                alert('Lütfen 5 fotoğraf çekin.'); return;
             }
-            const dt = new DataTransfer();
-            photos.forEach((p, i) => dt.items.add(new File([p], `photo_${i}.jpg`, { type: 'image/jpeg' })));
-            photoInput.files = dt.files;
+
+            // Butonu yükleniyor durumuna getir
             saveBtn.disabled = true;
+            const originalBtnContent = saveBtn.innerHTML;
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> İşleniyor...';
+
+            const formData = new FormData();
+            photos.forEach((p, i) => formData.append('fotograflar', p, `photo_${i}.jpg`));
+
+            try {
+                const response = await fetch(uploadForm.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok || response.redirected) {
+                    // Başarılı
+                    window.location.href = '/ogrenci/yuz-kayit?basarili=true';
+                } else {
+                    // Hata durumunu yönet
+                    let errorMessage = 'Kayıt sırasında bir hata oluştu.';
+                    try {
+                        const errorData = await response.json();
+                        if (errorData && errorData.mesaj) {
+                            errorMessage = errorData.mesaj;
+                        } else if (typeof errorData === 'string') {
+                            errorMessage = errorData;
+                        }
+                    } catch (jsonErr) {
+                        try {
+                            const text = await response.text();
+                            if (text) errorMessage = text;
+                        } catch (textErr) { console.error(textErr); }
+                    }
+
+                    // Mesajları temizle
+                    if (errorMessage.includes('yuz bulunamadi') || errorMessage.includes('No face detected')) {
+                        errorMessage = 'Fotoğrafların bazılarında yüz algılanamadı. Işık alan bir yerde, yüzünüz net görünecek şekilde tekrar deneyin.';
+                    } else if (errorMessage.includes('coklu yuz')) {
+                        errorMessage = 'Birden fazla yüz algılandı. Lütfen sadece kendi yüzünüzün göründüğünden emin olun.';
+                    } else if (errorMessage.includes('eslesmedi')) {
+                        errorMessage = 'Yüz verileri doğrulanamadı. Lütfen adımları takip ederek dikkatlice tekrar çekim yapın.';
+                    }
+
+                    throw new Error(errorMessage);
+                }
+
+            } catch (err) {
+                // Teknik detayları temizle
+                let cleanMsg = err.message;
+                if (cleanMsg.includes('{') || cleanMsg.includes('400') || cleanMsg.includes('BAD REQUEST')) {
+                    cleanMsg = 'Kayıt işlemi başarısız oldu. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.';
+                }
+
+                alert(cleanMsg);
+
+                // Butonu eski haline getir
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = originalBtnContent;
+            }
         });
 
         /*<![CDATA[*/

@@ -165,8 +165,31 @@
                             window.location.href = '/ogrenci';
                         }, 2500);
                     } else {
-                        const text = await response.text();
-                        throw new Error(text || 'Yüz eşleşmedi veya hata oluştu.');
+                        // Hata mesajını düzgün parse et
+                        let errorMessage = 'Yüz eşleşmedi veya bir hata oluştu.';
+                        try {
+                            // Önce JSON olarak okumayı dene
+                            const errorData = await response.json();
+                            // Backend'den gelen JSON içindeki mesajı al
+                            if (errorData && errorData.mesaj) {
+                                errorMessage = errorData.mesaj;
+                            } else if (typeof errorData === 'string') {
+                                errorMessage = errorData;
+                            }
+                        } catch (e) {
+                            // JSON değilse text olarak al
+                            try {
+                                const text = await response.text();
+                                if (text) errorMessage = text;
+                            } catch (e2) { console.error(e2); }
+                        }
+
+                        // Mesajı sadeleştir
+                        if (errorMessage.includes('eslesmedi') || errorMessage.includes('bulunamadı') || errorMessage.includes('false')) {
+                            errorMessage = 'Yüzünüz doğrulanamadı. Lütfen kameraya tam karşıdan bakarak tekrar deneyin.';
+                        }
+
+                        throw new Error(errorMessage);
                     }
                 } catch (err) {
                     // Network hatası olsa bile yoklama kaydedilmiş olabilir
@@ -177,7 +200,13 @@
                             window.location.href = '/ogrenci';
                         }, 2500);
                     } else {
-                        alert('Hata: ' + err.message);
+                        // Teknik detayları temizle
+                        let cleanMsg = err.message;
+                        if (cleanMsg.includes('{') || cleanMsg.includes('400') || cleanMsg.includes('BAD REQUEST')) {
+                            cleanMsg = 'Yüzünüz doğrulanamadı. Lütfen ışık alan bir yerde tekrar deneyin.';
+                        }
+
+                        alert(cleanMsg);
                         attendBtn.disabled = false;
                         attendBtn.innerHTML = '<i class="fas fa-face-smile"></i> Tekrar Dene';
                     }
