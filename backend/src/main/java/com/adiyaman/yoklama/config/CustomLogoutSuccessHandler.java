@@ -6,7 +6,7 @@ import com.adiyaman.yoklama.service.YoklamaService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -14,11 +14,16 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@RequiredArgsConstructor
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
     private final KullaniciService kullaniciService;
     private final YoklamaService yoklamaService;
+
+    public CustomLogoutSuccessHandler(@Lazy KullaniciService kullaniciService,
+            @Lazy YoklamaService yoklamaService) {
+        this.kullaniciService = kullaniciService;
+        this.yoklamaService = yoklamaService;
+    }
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
