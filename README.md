@@ -1,6 +1,8 @@
-# 🎓 Yüz Tanıma ile Yoklama Sistemi (Graduation Project)
+# 🎓# Yüz Tanıma ile Yoklama Sistemi
 
-Bu proje, Adıyaman Üniversitesi için geliştirilmiş, **Yüz Tanıma Teknolojisi** kullanan modern bir yoklama takip sistemidir.
+Bu proje, Spring Boot ve Python Flask kullanarak geliştirilmiş bir yüz tanıma ile yoklama sistemidir.
+
+**Canlı Demo:** [http://63.180.55.210:8080](http://63.180.55.210:8080)
 
 ![Project Banner](https://via.placeholder.com/1200x400?text=Yuz+Tanima+Ile+Yoklama+Sistemi)
 
