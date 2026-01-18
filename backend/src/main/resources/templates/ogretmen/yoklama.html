@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Auto refresh every 5 seconds to see new students -->
-    <meta http-equiv="refresh" content="5">
-    <title>Aktif Yoklama - Öğretmen Paneli</title>
+    <!-- Auto refresh only if session is active -->
+    <meta th:if="${oturum.aktif}" http-equiv="refresh" content="5">
+    <title th:text="${oturum.aktif ? 'Aktif Yoklama' : 'Yoklama Detayı'} + ' - Öğretmen Paneli'">Yoklama</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -27,7 +27,9 @@
 
     <main class="container">
 
-        <div class="card active-session mb-4" style="border: 2px solid var(--success) !important;">
+        <!-- Aktif Yoklama Kartı - Sadece aktif oturumda göster -->
+        <div th:if="${oturum.aktif}" class="card active-session mb-4"
+            style="border: 2px solid var(--success) !important;">
             <div class="text-center">
                 <div class="pulse-icon mb-2" style="font-size: 3rem; color: var(--success);">
                     <i class="fas fa-wifi"></i>
@@ -47,11 +49,31 @@
             </div>
         </div>
 
+        <!-- Geçmiş Yoklama Kartı - Sadece bitmiş oturumda göster -->
+        <div th:unless="${oturum.aktif}" class="card mb-4">
+            <div class="text-center">
+                <div class="mb-2" style="font-size: 3rem; color: var(--text-muted);">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h1 class="mb-2">Yoklama Detayı</h1>
+                <h2 th:text="${oturum.ders.ad}" class="mb-1"></h2>
+                <p class="text-muted"><span th:text="${oturum.ders.kod}"></span> - <span
+                        th:text="${oturum.ders.sinif != null ? oturum.ders.sinif.ad : ''}"></span></p>
+                <p class="text-muted mt-2">
+                    <i class="fas fa-calendar"></i> <span
+                        th:text="${#temporals.format(oturum.baslangicZamani, 'dd.MM.yyyy HH:mm')}"></span>
+                </p>
+            </div>
+        </div>
+
         <div class="d-flex justify-between align-center mb-3">
             <h3><i class="fas fa-users"></i> Katılan Öğrenciler (<span th:text="${kayitlar.size()}"></span>)</h3>
-            <div class="text-muted" style="font-size: 0.9rem;">
+            <div th:if="${oturum.aktif}" class="text-muted" style="font-size: 0.9rem;">
                 <i class="fas fa-sync fa-spin"></i> Otomatik Yenileniyor...
             </div>
+            <a th:unless="${oturum.aktif}" th:href="@{/ogretmen/gecmis}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Geri
+            </a>
         </div>
 
         <div class="card">

@@ -157,7 +157,8 @@
                     }
                 } catch (err) {
                     // Network hatası olsa bile yoklama kaydedilmiş olabilir
-                    if (err.message.includes('fetch')) {
+                    // Mobilde "Load failed" veya "fetch" hatası alınabilir
+                    if (err.message.includes('fetch') || err.message.includes('Load failed') || err.message.includes('Failed')) {
                         successModal.style.display = 'flex';
                         setTimeout(() => {
                             window.location.href = '/ogrenci';
