@@ -37,7 +37,8 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Yoklama için yüz tanıma işlemi sırasında kamera kullanılmaktadır."
+          "cameraPermission": "Yoklama için yüz tanıma işlemi sırasında kamera kullanılmaktadır.",
+          "microphonePermission": "Video kaydı durumunda ses kaydı için kullanılır."
         }
       ]
     ],
