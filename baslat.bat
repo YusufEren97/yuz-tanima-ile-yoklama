@@ -24,6 +24,6 @@ REM 20 saniye sonra tarayici ac
 start "" cmd /c "timeout /t 20 /nobreak >nul && start http://localhost:8080"
 
 cd /d "%~dp0backend"
-mvnw spring-boot:run
+.\mvnw.cmd spring-boot:run
 
 pause
